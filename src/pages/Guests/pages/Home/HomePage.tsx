@@ -21,9 +21,10 @@ import {
 interface HomePageProps {
   guestData: GuestData;
   hotelId: string;
+  onNavigate?: (tab: string) => void;
 }
 
-export const HomePage = ({ guestData, hotelId }: HomePageProps) => {
+export const HomePage = ({ guestData, hotelId, onNavigate }: HomePageProps) => {
   // For now, we'll use mock dates since they're not in the database yet
   // TODO: Add check_in_date and check_out_date to the guests table
   const mockCheckIn = "2025-08-29";
@@ -42,6 +43,22 @@ export const HomePage = ({ guestData, hotelId }: HomePageProps) => {
     console.log(`🏠 [HomePage] Category changed to: ${category}`);
     setActiveCategory(category);
   };
+
+  const handleQuickAccessClick = (cardId: string) => {
+    console.log(`🏠 [HomePage] Quick access card clicked: ${cardId}`);
+
+    // Navigate to the corresponding page/tab
+    if (cardId === "dine-in" && onNavigate) {
+      console.log("✅ [HomePage] Navigating to dine-in page");
+      onNavigate("dine-in");
+    } else if (cardId === "hotel-shop" && onNavigate) {
+      console.log("✅ [HomePage] Navigating to shop page");
+      onNavigate("shop");
+    } else {
+      console.warn(`⚠️ [HomePage] No navigation handler for: ${cardId}`);
+    }
+  };
+
   const getCategoryCards = () => {
     switch (activeCategory) {
       case "hotel":
@@ -50,21 +67,25 @@ export const HomePage = ({ guestData, hotelId }: HomePageProps) => {
             id: "amenities",
             title: "Amenities",
             description: "Hotel facilities and services",
+            onClick: () => handleQuickAccessClick("amenities"),
           },
           {
             id: "dine-in",
             title: "Dine In",
             description: "Room service and restaurant",
+            onClick: () => handleQuickAccessClick("dine-in"),
           },
           {
             id: "hotel-shop",
             title: "Hotel Shop",
             description: "Purchase hotel merchandise",
+            onClick: () => handleQuickAccessClick("hotel-shop"),
           },
           {
             id: "qna",
             title: "Q&A",
             description: "Frequently asked questions",
+            onClick: () => handleQuickAccessClick("qna"),
           },
         ];
       case "experiences":

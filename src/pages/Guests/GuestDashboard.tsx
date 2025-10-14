@@ -153,7 +153,13 @@ export const GuestDashboard = () => {
   const renderActivePage = () => {
     switch (activeTab) {
       case "home":
-        return <HomePage guestData={guestData} hotelId={guestData.hotel_id} />;
+        return (
+          <HomePage
+            guestData={guestData}
+            hotelId={guestData.hotel_id}
+            onNavigate={(tab) => setActiveTab(tab as NavigationTab)}
+          />
+        );
       case "services":
         return <ServicesPage />;
       case "dine-in":
@@ -161,7 +167,13 @@ export const GuestDashboard = () => {
       case "shop":
         return <ShopPage />;
       default:
-        return <HomePage guestData={guestData} hotelId={guestData.hotel_id} />;
+        return (
+          <HomePage
+            guestData={guestData}
+            hotelId={guestData.hotel_id}
+            onNavigate={(tab) => setActiveTab(tab as NavigationTab)}
+          />
+        );
     }
   };
 
