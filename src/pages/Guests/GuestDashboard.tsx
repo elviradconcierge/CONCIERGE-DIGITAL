@@ -181,6 +181,7 @@ export const GuestDashboard = () => {
 
   return (
     <GuestLayout
+      guestId={guestData.id}
       guestName={guestData.guest_name}
       hotelName={hotelData?.name || "Hotel"}
       roomNumber={guestData.room_number}
