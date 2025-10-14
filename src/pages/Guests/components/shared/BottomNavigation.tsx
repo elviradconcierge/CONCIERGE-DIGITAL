@@ -14,7 +14,13 @@ import {
   LogOut,
 } from "lucide-react";
 
-export type NavigationTab = "home" | "services" | "dine-in" | "shop" | "logout";
+export type NavigationTab =
+  | "home"
+  | "services"
+  | "dine-in"
+  | "shop"
+  | "qa"
+  | "logout";
 
 interface BottomNavigationProps {
   activeTab: NavigationTab;

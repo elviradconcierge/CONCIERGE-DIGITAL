@@ -4,8 +4,9 @@
  * Room service and restaurant menu - displays menu items in Uber Eats style
  */
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { MenuItemCard } from "../../components/MenuItemCard";
+import { RecommendedItemModal } from "../Home/components/RecommendedSection/RecommendedItemModal";
 import {
   useRestaurantMenuItems,
   filterAvailableMenuItems,
@@ -13,11 +14,18 @@ import {
   type MenuItem,
 } from "../../../../hooks/queries/hotel-management/restaurants";
 import { getGuestSession } from "../../../../services/guestAuth.service";
+import type { RecommendedItem } from "../../../../hooks/queries";
 
 export const DineInPage = () => {
   // Get hotel ID from guest session
   const session = getGuestSession();
   const hotelId = session?.guestData?.hotel_id || "";
+
+  // Modal state
+  const [selectedItem, setSelectedItem] = useState<RecommendedItem | null>(
+    null
+  );
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Fetch all menu items for the hotel
   const { data: menuItems = [], isLoading } = useRestaurantMenuItems(hotelId);
@@ -39,7 +47,26 @@ export const DineInPage = () => {
 
   const handleCardClick = (item: MenuItem) => {
     console.log("🍽️ [DineInPage] Menu item clicked:", item.name);
-    // TODO: Open modal or navigate to item details
+
+    // Transform MenuItem to RecommendedItem format
+    const recommendedItem: RecommendedItem = {
+      id: item.id,
+      type: "menu_item",
+      title: item.name,
+      description: item.description || undefined,
+      price: item.price,
+      imageUrl: item.image_url || undefined,
+      category: item.category,
+    };
+
+    setSelectedItem(recommendedItem);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    // Clear after animation
+    setTimeout(() => setSelectedItem(null), 300);
   };
 
   if (isLoading) {
@@ -76,11 +103,11 @@ export const DineInPage = () => {
   return (
     <div className="pb-6">
       {/* Page Header */}
-      <div className="px-4 py-6 bg-gradient-to-br from-blue-50 to-purple-50 mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+      <div className="px-4 py-3 bg-gradient-to-br from-blue-50 to-purple-50 mb-4">
+        <h1 className="text-xl font-bold text-gray-900 mb-1">
           Restaurant Menu
         </h1>
-        <p className="text-gray-600">
+        <p className="text-sm text-gray-600">
           Order delicious meals from our hotel restaurants
         </p>
       </div>
@@ -99,26 +126,47 @@ export const DineInPage = () => {
 
             {/* Vertical List of Compact Cards */}
             <div className="space-y-3">
-              {items.map((item) => (
-                <MenuItemCard
-                  key={item.id}
-                  id={item.id}
-                  title={item.name}
-                  description={item.description || undefined}
-                  imageUrl={item.image_url || undefined}
-                  price={`$${item.price.toFixed(2)}`}
-                  tags={[
-                    ...(item.service_type || []),
-                    ...(item.special_type || []),
-                  ]}
-                  isAvailable={item.is_available}
-                  onClick={() => handleCardClick(item)}
-                />
-              ))}
+              {items.map((item) => {
+                // Check if item is recommended based on special_type
+                const isRecommended =
+                  item.special_type?.some((type) =>
+                    [
+                      "Chef's Special",
+                      "Recommended",
+                      "House Special",
+                      "Signature",
+                    ].includes(type)
+                  ) || false;
+
+                return (
+                  <MenuItemCard
+                    key={item.id}
+                    id={item.id}
+                    title={item.name}
+                    description={item.description || undefined}
+                    imageUrl={item.image_url || undefined}
+                    price={`$${item.price.toFixed(2)}`}
+                    tags={[
+                      ...(item.service_type || []),
+                      ...(item.special_type || []),
+                    ]}
+                    isAvailable={item.is_available}
+                    isRecommended={isRecommended}
+                    onClick={() => handleCardClick(item)}
+                  />
+                );
+              })}
             </div>
           </div>
         ))}
       </div>
+
+      {/* Modal */}
+      <RecommendedItemModal
+        item={selectedItem}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+      />
     </div>
   );
 };

@@ -47,7 +47,7 @@ export const QA_RECOMMENDATION_WITH_DETAILS_SELECT = `
   ),
   hotels!qa_recommendations_hotel_id_fkey(
     id,
-    hotel_name
+    name
   )
 `;
 

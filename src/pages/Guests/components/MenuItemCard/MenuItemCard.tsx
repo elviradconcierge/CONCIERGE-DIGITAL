@@ -6,10 +6,12 @@
  * - Image on the left
  * - Title, description, price on the right
  * - Tags for service type and special type
+ * - Star icon for recommended items
  * - Mobile-optimized compact design
  */
 
 import { useState } from "react";
+import { Star } from "lucide-react";
 
 export interface MenuItemCardProps {
   id: string;
@@ -20,6 +22,7 @@ export interface MenuItemCardProps {
   tags?: string[];
   category?: string;
   isAvailable?: boolean;
+  isRecommended?: boolean;
   onClick?: () => void;
 }
 
@@ -30,6 +33,7 @@ export const MenuItemCard = ({
   price,
   tags = [],
   isAvailable = true,
+  isRecommended = false,
   onClick,
 }: MenuItemCardProps) => {
   const [imageError, setImageError] = useState(false);
@@ -37,12 +41,12 @@ export const MenuItemCard = ({
   return (
     <div
       onClick={onClick}
-      className={`flex gap-3 bg-white rounded-lg p-3 shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 cursor-pointer ${
+      className={`flex gap-0 bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 cursor-pointer overflow-hidden ${
         !isAvailable ? "opacity-60" : ""
       }`}
     >
       {/* Image - Left Side */}
-      <div className="relative flex-shrink-0 w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg overflow-hidden">
+      <div className="relative flex-shrink-0 w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
         {imageUrl && !imageError ? (
           <img
             src={imageUrl}
@@ -56,6 +60,14 @@ export const MenuItemCard = ({
             <span className="text-3xl">🍽️</span>
           </div>
         )}
+
+        {/* Recommended Star Badge */}
+        {isRecommended && (
+          <div className="absolute top-2 left-2 bg-amber-500 rounded-full p-1 shadow-md">
+            <Star className="w-3 h-3 text-white fill-white" />
+          </div>
+        )}
+
         {!isAvailable && (
           <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
             <span className="text-white text-xs font-semibold">
@@ -66,7 +78,7 @@ export const MenuItemCard = ({
       </div>
 
       {/* Content - Right Side */}
-      <div className="flex-1 min-w-0 flex flex-col justify-between">
+      <div className="flex-1 min-w-0 flex flex-col justify-between p-3">
         {/* Title and Price Row */}
         <div>
           <div className="flex items-start justify-between gap-2 mb-1">
@@ -79,6 +91,7 @@ export const MenuItemCard = ({
           </div>
 
           {/* Description */}
+
           {description && (
             <p className="text-xs text-gray-600 line-clamp-2 mb-2 leading-relaxed">
               {description}

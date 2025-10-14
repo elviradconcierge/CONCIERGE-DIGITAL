@@ -14,7 +14,7 @@ import {
   type HotelData,
 } from "../../services/guestAuth.service";
 import { GuestLayout, NavigationTab } from "./components/shared";
-import { HomePage, ServicesPage, DineInPage, ShopPage } from "./pages";
+import { HomePage, ServicesPage, DineInPage, ShopPage, QAPage } from "./pages";
 import { useUpdateGuestDND } from "../../hooks/queries";
 
 export const GuestDashboard = () => {
@@ -166,6 +166,8 @@ export const GuestDashboard = () => {
         return <DineInPage />;
       case "shop":
         return <ShopPage />;
+      case "qa":
+        return <QAPage />;
       default:
         return (
           <HomePage

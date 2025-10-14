@@ -43,6 +43,11 @@ export const useActiveQARecommendations = (hotelId: string) => {
   return useQuery({
     queryKey: qaRecommendationsKeys.active(hotelId),
     queryFn: async () => {
+      console.log("🔍 [useActiveQARecommendations] Starting query", {
+        hotelId,
+        enabled: !!hotelId,
+      });
+
       const { data, error } = await supabase
         .from("qa_recommendations")
         .select(QA_RECOMMENDATION_WITH_DETAILS_SELECT)
@@ -50,7 +55,26 @@ export const useActiveQARecommendations = (hotelId: string) => {
         .eq("is_active", true)
         .order("category", { ascending: true });
 
-      if (error) throw error;
+      console.log("📥 [useActiveQARecommendations] Query result", {
+        hasData: !!data,
+        dataLength: data?.length || 0,
+        hasError: !!error,
+        error: error?.message,
+        firstItem: data?.[0]
+          ? {
+              id: data[0].id,
+              question: data[0].question,
+              category: data[0].category,
+              isActive: data[0].is_active,
+            }
+          : null,
+      });
+
+      if (error) {
+        console.error("❌ [useActiveQARecommendations] Query error:", error);
+        throw error;
+      }
+
       return data as QARecommendationWithDetails[];
     },
     enabled: !!hotelId,
