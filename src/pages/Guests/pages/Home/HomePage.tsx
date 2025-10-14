@@ -12,6 +12,7 @@ import {
   CategoryType,
   QuickAccessSection,
   RecommendedSection,
+  ApprovedThirdPartySection,
   AboutUsSection,
   PhotoGallerySection,
   EmergencyContactsSection,
@@ -138,6 +139,11 @@ export const HomePage = ({ guestData, hotelId }: HomePageProps) => {
 
       {/* Recommended for You Section - Only visible in Hotel category */}
       {activeCategory === "hotel" && <RecommendedSection hotelId={hotelId} />}
+
+      {/* Approved Third Party Section - Only visible in Experiences category */}
+      {activeCategory === "experiences" && (
+        <ApprovedThirdPartySection hotelId={hotelId} />
+      )}
 
       {/* About Us Section */}
       <AboutUsSection hotelId={hotelId} />
