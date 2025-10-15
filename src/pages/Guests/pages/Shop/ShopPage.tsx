@@ -4,7 +4,6 @@
  * Hotel merchandise and products - displays products in a compact mobile-friendly format
  */
 
-import { useState } from "react";
 import { FilterableListPage } from "../../components/FilterableListPage";
 import { useGuestHotelId } from "../../hooks";
 import {
@@ -14,10 +13,12 @@ import {
 import { useProductCategories } from "../../../../hooks/queries/hotel-management/products/useProductQueries";
 import type { RecommendedItem } from "../../../../hooks/queries";
 import { MenuItemCard } from "../../components/MenuItemCard";
+import { useCart } from "../../../../contexts/CartContext";
 
 export const ShopPage = () => {
-  const [cartItemCount] = useState(0); // TODO: Connect to cart state
   const hotelId = useGuestHotelId();
+  const { getTotalItemsByType } = useCart();
+  const cartItemCount = getTotalItemsByType("product");
 
   // Fetch data
   const { data: products = [], isLoading } = useProducts(hotelId);
@@ -50,6 +51,10 @@ export const ShopPage = () => {
       isAvailable={product.is_active && (product.stock_quantity || 0) > 0}
       isRecommended={product.hotel_recommended || false}
       onClick={() => onClick(product)}
+      showCartButton={true}
+      itemType="product"
+      numericPrice={product.price}
+      category={product.category}
     />
   );
 

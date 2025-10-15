@@ -23,6 +23,7 @@ import {
   GastronomyPage,
 } from "./pages";
 import { useGuestSession, useTabNavigation, useDndManagement } from "./hooks";
+import { CartProvider } from "../../contexts/CartContext";
 
 export const GuestDashboard = () => {
   // Guest session management
@@ -101,20 +102,22 @@ export const GuestDashboard = () => {
   };
 
   return (
-    <GuestLayout
-      guestId={localGuestData.id}
-      guestName={localGuestData.guest_name}
-      hotelName={hotelData?.name || "Hotel"}
-      roomNumber={localGuestData.room_number}
-      hotelId={localGuestData.hotel_id}
-      receptionPhone={hotelData?.reception_phone}
-      isDndActive={isDndActive}
-      isDndUpdating={isDndUpdating}
-      activeTab={activeTab}
-      onTabChange={handleTabChange}
-      onDndToggle={handleDndToggle}
-    >
-      {renderActivePage()}
-    </GuestLayout>
+    <CartProvider>
+      <GuestLayout
+        guestId={localGuestData.id}
+        guestName={localGuestData.guest_name}
+        hotelName={hotelData?.name || "Hotel"}
+        roomNumber={localGuestData.room_number}
+        hotelId={localGuestData.hotel_id}
+        receptionPhone={hotelData?.reception_phone}
+        isDndActive={isDndActive}
+        isDndUpdating={isDndUpdating}
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+        onDndToggle={handleDndToggle}
+      >
+        {renderActivePage()}
+      </GuestLayout>
+    </CartProvider>
   );
 };

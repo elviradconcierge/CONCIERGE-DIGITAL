@@ -4,7 +4,7 @@
  * Room service and restaurant menu - displays menu items in Uber Eats style
  */
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { FilterableListPage } from "../../components/FilterableListPage";
 import { useGuestHotelId } from "../../hooks";
 import {
@@ -15,10 +15,12 @@ import {
 } from "../../../../hooks/queries/hotel-management/restaurants";
 import type { RecommendedItem } from "../../../../hooks/queries";
 import type { FilterOptions } from "../../components/common";
+import { useCart } from "../../../../contexts/CartContext";
 
 export const DineInPage = () => {
-  const [cartItemCount] = useState(0); // TODO: Connect to cart state
   const hotelId = useGuestHotelId();
+  const { getTotalItemsByType } = useCart();
+  const cartItemCount = getTotalItemsByType("food");
 
   // Fetch data
   const { data: menuItems = [], isLoading } = useRestaurantMenuItems(hotelId);

@@ -209,6 +209,15 @@ export function FilterableListPage<T extends FilterableItem>({
       isAvailable={item.is_active !== false}
       isRecommended={item.hotel_recommended || false}
       onClick={() => handleCardClick(item)}
+      showCartButton={true}
+      itemType={
+        item.category?.toLowerCase().includes("shop") ||
+        item.category?.toLowerCase().includes("product")
+          ? "product"
+          : "food"
+      }
+      numericPrice={item.price}
+      category={item.category}
     />
   );
 

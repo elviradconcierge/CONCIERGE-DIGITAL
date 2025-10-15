@@ -77,9 +77,9 @@ export const SearchBar = ({
           onClick={onCartClick}
           className="
             relative p-2
-            bg-green-600 border border-green-600 rounded-lg
-            hover:bg-green-700
-            active:bg-green-800
+            bg-white border border-gray-300 rounded-lg
+            hover:bg-gray-50 hover:border-gray-400
+            active:bg-gray-100
             focus:outline-none focus:ring-1 focus:ring-green-500
             transition-all
             flex items-center justify-center
@@ -87,7 +87,7 @@ export const SearchBar = ({
           "
           aria-label={`Cart with ${cartItemCount} items`}
         >
-          <ShoppingCart className="h-4 w-4 text-white" />
+          <ShoppingCart className="h-4 w-4 text-gray-600" />
 
           {/* Cart Badge */}
           {cartItemCount > 0 && (

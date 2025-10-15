@@ -13,6 +13,7 @@ import {
   ShoppingBag,
   LogOut,
 } from "lucide-react";
+import { useCart } from "../../../../contexts/CartContext";
 
 export type NavigationTab =
   | "home"
@@ -69,6 +70,10 @@ export const BottomNavigation = ({
   onTabChange,
   isVisible = true,
 }: BottomNavigationProps) => {
+  const { getTotalItemsByType } = useCart();
+  const dineInCartCount = getTotalItemsByType("food");
+  const shopCartCount = getTotalItemsByType("product");
+
   const handleTabClick = (tabId: NavigationTab) => {
     onTabChange(tabId);
   };
@@ -110,11 +115,48 @@ export const BottomNavigation = ({
               {/* Icon */}
               <div
                 className={`
+                  relative
                   transition-transform duration-200
                   ${isActive ? "scale-110" : "scale-100"}
                 `}
               >
                 {item.icon}
+
+                {/* Cart Badge for Dine In tab */}
+                {item.id === "dine-in" && dineInCartCount > 0 && (
+                  <span
+                    className="
+                      absolute -top-1.5 -right-1.5
+                      bg-red-500 text-white
+                      text-[9px] font-bold
+                      rounded-full
+                      h-4 w-4
+                      flex items-center justify-center
+                      border border-white
+                      shadow-sm
+                    "
+                  >
+                    {dineInCartCount > 9 ? "9+" : dineInCartCount}
+                  </span>
+                )}
+
+                {/* Cart Badge for Shop tab */}
+                {item.id === "shop" && shopCartCount > 0 && (
+                  <span
+                    className="
+                      absolute -top-1.5 -right-1.5
+                      bg-red-500 text-white
+                      text-[9px] font-bold
+                      rounded-full
+                      h-4 w-4
+                      flex items-center justify-center
+                      border border-white
+                      shadow-sm
+                    "
+                  >
+                    {shopCartCount > 9 ? "9+" : shopCartCount}
+                  </span>
+                )}
               </div>
 
               {/* Label */}

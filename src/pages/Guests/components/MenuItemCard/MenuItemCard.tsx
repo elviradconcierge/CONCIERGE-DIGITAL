@@ -12,6 +12,7 @@
 
 import { useState } from "react";
 import { Star } from "lucide-react";
+import { AddToCartButton } from "../cart";
 
 export interface MenuItemCardProps {
   id: string;
@@ -24,23 +25,39 @@ export interface MenuItemCardProps {
   isAvailable?: boolean;
   isRecommended?: boolean;
   onClick?: () => void;
+  // Cart functionality
+  showCartButton?: boolean;
+  itemType?: "food" | "product";
+  numericPrice?: number; // For cart functionality
 }
 
 export const MenuItemCard = ({
+  id,
   title,
   description,
   imageUrl,
   price,
   tags = [],
+  category,
   isAvailable = true,
   isRecommended = false,
   onClick,
+  showCartButton = false,
+  itemType = "food",
+  numericPrice,
 }: MenuItemCardProps) => {
   const [imageError, setImageError] = useState(false);
 
+  const handleCardClick = () => {
+    // Only trigger onClick if not clicking the cart button
+    if (onClick) {
+      onClick();
+    }
+  };
+
   return (
     <div
-      onClick={onClick}
+      onClick={handleCardClick}
       className={`flex gap-0 bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 cursor-pointer overflow-hidden ${
         !isAvailable ? "opacity-60" : ""
       }`}
@@ -65,6 +82,26 @@ export const MenuItemCard = ({
         {isRecommended && (
           <div className="absolute top-2 left-2 bg-amber-500 rounded-full p-1 shadow-md">
             <Star className="w-3 h-3 text-white fill-white" />
+          </div>
+        )}
+
+        {/* Add to Cart Button - Bottom Right Corner */}
+        {showCartButton && numericPrice !== undefined && isAvailable && (
+          <div
+            className="absolute bottom-1.5 right-1.5 z-10"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <AddToCartButton
+              itemId={id}
+              itemName={title}
+              itemPrice={numericPrice}
+              itemImage={imageUrl}
+              itemType={itemType}
+              itemDescription={description}
+              itemCategory={category}
+              size="sm"
+              disabled={!isAvailable}
+            />
           </div>
         )}
 
