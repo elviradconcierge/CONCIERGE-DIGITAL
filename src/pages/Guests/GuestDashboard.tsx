@@ -20,6 +20,7 @@ import {
   ShopPage,
   QAPage,
   ToursPage,
+  GastronomyPage,
 } from "./pages";
 import { useGuestSession, useTabNavigation, useDndManagement } from "./hooks";
 
@@ -84,6 +85,8 @@ export const GuestDashboard = () => {
         return <ShopPage />;
       case "tours":
         return <ToursPage />;
+      case "gastronomy":
+        return <GastronomyPage />;
       case "qa":
         return <QAPage />;
       default:

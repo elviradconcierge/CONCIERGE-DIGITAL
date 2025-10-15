@@ -21,6 +21,7 @@ export type NavigationTab =
   | "shop"
   | "qa"
   | "tours"
+  | "gastronomy"
   | "logout";
 
 interface BottomNavigationProps {

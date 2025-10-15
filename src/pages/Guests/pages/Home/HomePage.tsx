@@ -84,6 +84,7 @@ export const HomePage = ({ guestData, hotelId, onNavigate }: HomePageProps) => {
             id: "gastronomy",
             title: "Gastronomy",
             description: "Discover local cuisine and dining experiences",
+            onClick: () => onNavigate?.("gastronomy"),
           },
           {
             id: "tours",
