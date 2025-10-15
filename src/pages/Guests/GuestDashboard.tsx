@@ -48,6 +48,10 @@ export const GuestDashboard = () => {
       hotel_id: session.guestData.hotel_id,
     });
     console.log("🏨 [Guest Dashboard] Hotel data:", session.hotelData);
+    console.log(
+      "📞 [Guest Dashboard] Reception phone:",
+      session.hotelData?.reception_phone
+    );
 
     // Check if access has expired
     const expiresAt = new Date(session.guestData.access_code_expires_at);
@@ -186,6 +190,7 @@ export const GuestDashboard = () => {
       hotelName={hotelData?.name || "Hotel"}
       roomNumber={guestData.room_number}
       hotelId={guestData.hotel_id}
+      receptionPhone={hotelData?.reception_phone}
       isDndActive={isDndActive}
       isDndUpdating={isDndUpdating}
       activeTab={activeTab}

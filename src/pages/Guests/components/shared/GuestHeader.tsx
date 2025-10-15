@@ -27,7 +27,6 @@ export const GuestHeader = ({
   const handleDndToggle = async () => {
     try {
       await onDndToggle(!isDndActive);
-      console.log(`🔔 [Guest Header] DND status toggled to: ${!isDndActive}`);
     } catch (error) {
       console.error("❌ [Guest Header] Error toggling DND:", error);
     }

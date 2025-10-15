@@ -21,15 +21,11 @@ export const RequestHistoryModal = ({
   isOpen,
   onClose,
 }: RequestHistoryModalProps) => {
-  console.log("📋 [RequestHistoryModal] Render:", { isOpen });
-
   // Prevent body scroll when modal is open
   useEffect(() => {
     if (isOpen) {
-      console.log("🔒 [RequestHistoryModal] Locking body scroll");
       document.body.style.overflow = "hidden";
     } else {
-      console.log("🔓 [RequestHistoryModal] Unlocking body scroll");
       document.body.style.overflow = "";
     }
 
@@ -39,15 +35,11 @@ export const RequestHistoryModal = ({
   }, [isOpen]);
 
   if (!isOpen) {
-    console.log("❌ [RequestHistoryModal] Not rendering - modal closed");
     return null;
   }
 
-  console.log("✅ [RequestHistoryModal] Rendering modal");
-
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
-      console.log("🎯 [RequestHistoryModal] Backdrop clicked - closing");
       onClose();
     }
   };

@@ -22,20 +22,13 @@ export const DineInMenuSection = ({ hotelId }: DineInMenuSectionProps) => {
   // Fetch all menu items for the hotel
   const { data: menuItems = [], isLoading } = useRestaurantMenuItems(hotelId);
 
-  console.log("🍽️ [DineInMenuSection] Fetched menu items:", menuItems.length);
-
   // Filter only available items and group by category
   const categorizedMenu = useMemo(() => {
     const available = filterAvailableMenuItems(menuItems);
-    console.log(
-      "✅ [DineInMenuSection] Available menu items:",
-      available.length
-    );
     return groupMenuItemsByCategory(available);
   }, [menuItems]);
 
   const handleCardClick = (item: MenuItem) => {
-    console.log("🍽️ [DineInMenuSection] Menu item clicked:", item.name);
     // TODO: Open modal or navigate to item details
   };
 

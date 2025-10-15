@@ -68,7 +68,6 @@ export const BottomNavigation = ({
   isVisible = true,
 }: BottomNavigationProps) => {
   const handleTabClick = (tabId: NavigationTab) => {
-    console.log(`📱 [Bottom Nav] Tab clicked: ${tabId}`);
     onTabChange(tabId);
   };
 

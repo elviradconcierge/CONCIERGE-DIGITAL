@@ -5,168 +5,124 @@
  */
 
 import { useMemo, useState } from "react";
-import { MenuItemCard } from "../../components/MenuItemCard";
-import { RecommendedItemModal } from "../Home/components/RecommendedSection/RecommendedItemModal";
+import { FilterableListPage } from "../../components/FilterableListPage";
+import { useGuestHotelId } from "../../hooks";
 import {
   useRestaurantMenuItems,
-  filterAvailableMenuItems,
-  groupMenuItemsByCategory,
+  useRestaurants,
+  getUniqueCategories,
   type MenuItem,
 } from "../../../../hooks/queries/hotel-management/restaurants";
-import { getGuestSession } from "../../../../services/guestAuth.service";
 import type { RecommendedItem } from "../../../../hooks/queries";
+import type { FilterOptions } from "../../components/common";
 
 export const DineInPage = () => {
-  // Get hotel ID from guest session
-  const session = getGuestSession();
-  const hotelId = session?.guestData?.hotel_id || "";
+  const [cartItemCount] = useState(0); // TODO: Connect to cart state
+  const hotelId = useGuestHotelId();
 
-  // Modal state
-  const [selectedItem, setSelectedItem] = useState<RecommendedItem | null>(
-    null
-  );
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  // Fetch all menu items for the hotel
+  // Fetch data
   const { data: menuItems = [], isLoading } = useRestaurantMenuItems(hotelId);
+  const { data: restaurants = [] } = useRestaurants(hotelId);
 
-  console.log("🍽️ [DineInPage] Fetched menu items:", menuItems.length);
+  // Calculate filter options
+  const categories = useMemo(() => getUniqueCategories(menuItems), [menuItems]);
 
-  // Group all items by category (showing both available and unavailable)
-  const categorizedMenu = useMemo(() => {
-    const available = filterAvailableMenuItems(menuItems);
-    console.log("✅ [DineInPage] Available menu items:", available.length);
-    console.log("📊 [DineInPage] Total menu items:", menuItems.length);
-
-    // If no available items, show all items
-    const itemsToShow = available.length > 0 ? available : menuItems;
-    console.log("🍽️ [DineInPage] Showing items:", itemsToShow.length);
-
-    return groupMenuItemsByCategory(itemsToShow);
+  const serviceTypes = useMemo(() => {
+    const types = new Set<string>();
+    menuItems.forEach((item) => {
+      if (item.service_type) {
+        item.service_type.forEach((type) => types.add(type));
+      }
+    });
+    return Array.from(types).sort();
   }, [menuItems]);
 
-  const handleCardClick = (item: MenuItem) => {
-    console.log("🍽️ [DineInPage] Menu item clicked:", item.name);
+  // Transform MenuItem to RecommendedItem
+  const transformMenuItem = (item: MenuItem): RecommendedItem => ({
+    id: item.id,
+    type: "menu_item",
+    title: item.name,
+    description: item.description || undefined,
+    price: item.price,
+    imageUrl: item.image_url || undefined,
+    category: item.category,
+  });
 
-    // Transform MenuItem to RecommendedItem format
-    const recommendedItem: RecommendedItem = {
-      id: item.id,
-      type: "menu_item",
-      title: item.name,
-      description: item.description || undefined,
-      price: item.price,
-      imageUrl: item.image_url || undefined,
-      category: item.category,
-    };
+  // Custom filtering logic for restaurants and service types
+  const customFilterItems = (
+    items: MenuItem[],
+    filters: FilterOptions,
+    searchQuery: string
+  ): MenuItem[] => {
+    let filtered = [...items];
 
-    setSelectedItem(recommendedItem);
-    setIsModalOpen(true);
-  };
+    // Search filter
+    if (searchQuery) {
+      filtered = filtered.filter(
+        (item) =>
+          item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          item.description?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    // Clear after animation
-    setTimeout(() => setSelectedItem(null), 300);
-  };
+    // Category filter
+    if (filters.selectedCategories.length > 0) {
+      filtered = filtered.filter((item) =>
+        filters.selectedCategories.includes(item.category)
+      );
+    }
 
-  if (isLoading) {
-    return (
-      <div className="px-4 py-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">Dine In</h1>
-        <div className="space-y-3">
-          {[1, 2, 3, 4, 5].map((i) => (
-            <div
-              key={i}
-              className="flex gap-3 h-24 bg-gray-100 rounded-lg animate-pulse"
-            />
-          ))}
-        </div>
-      </div>
+    // Price range filter
+    filtered = filtered.filter(
+      (item) =>
+        item.price >= filters.priceRange.min &&
+        item.price <= filters.priceRange.max
     );
-  }
 
-  if (menuItems.length === 0) {
-    return (
-      <div className="px-4 py-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">Dine In</h1>
-        <div className="text-center py-12 bg-gray-50 rounded-2xl">
-          <div className="text-6xl mb-4">🍽️</div>
-          <p className="text-gray-600 mb-2">No menu items available</p>
-          <p className="text-sm text-gray-500">
-            Please check back later or contact the front desk
-          </p>
-        </div>
-      </div>
-    );
-  }
+    // Restaurant filter
+    if (filters.selectedRestaurants && filters.selectedRestaurants.length > 0) {
+      filtered = filtered.filter((item) =>
+        filters.selectedRestaurants!.some((restId) =>
+          item.restaurant_ids.includes(restId)
+        )
+      );
+    }
+
+    // Service type filter
+    if (
+      filters.selectedServiceTypes &&
+      filters.selectedServiceTypes.length > 0
+    ) {
+      filtered = filtered.filter((item) =>
+        item.service_type?.some((type) =>
+          filters.selectedServiceTypes!.includes(type)
+        )
+      );
+    }
+
+    return filtered;
+  };
 
   return (
-    <div className="pb-6">
-      {/* Page Header */}
-      <div className="px-4 py-3 bg-gradient-to-br from-blue-50 to-purple-50 mb-4">
-        <h1 className="text-xl font-bold text-gray-900 mb-1">
-          Restaurant Menu
-        </h1>
-        <p className="text-sm text-gray-600">
-          Order delicious meals from our hotel restaurants
-        </p>
-      </div>
-
-      {/* Menu Items grouped by category */}
-      <div className="px-4">
-        {Object.entries(categorizedMenu).map(([category, items]) => (
-          <div key={category} className="mb-6">
-            {/* Category Header */}
-            <div className="flex items-center mb-3">
-              <h2 className="text-lg font-bold text-gray-900">{category}</h2>
-              <span className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
-                {items.length}
-              </span>
-            </div>
-
-            {/* Vertical List of Compact Cards */}
-            <div className="space-y-3">
-              {items.map((item) => {
-                // Check if item is recommended based on special_type
-                const isRecommended =
-                  item.special_type?.some((type) =>
-                    [
-                      "Chef's Special",
-                      "Recommended",
-                      "House Special",
-                      "Signature",
-                    ].includes(type)
-                  ) || false;
-
-                return (
-                  <MenuItemCard
-                    key={item.id}
-                    id={item.id}
-                    title={item.name}
-                    description={item.description || undefined}
-                    imageUrl={item.image_url || undefined}
-                    price={`$${item.price.toFixed(2)}`}
-                    tags={[
-                      ...(item.service_type || []),
-                      ...(item.special_type || []),
-                    ]}
-                    isAvailable={item.is_available}
-                    isRecommended={isRecommended}
-                    onClick={() => handleCardClick(item)}
-                  />
-                );
-              })}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Modal */}
-      <RecommendedItemModal
-        item={selectedItem}
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-      />
-    </div>
+    <FilterableListPage
+      searchPlaceholder="Search menu items..."
+      emptyStateConfig={{
+        emoji: "",
+        title: "No menu items available",
+        message: "Please check back later or contact the front desk",
+      }}
+      items={menuItems}
+      isLoading={isLoading}
+      categories={categories}
+      cartItemCount={cartItemCount}
+      onCartClick={() => console.log("Navigate to cart")}
+      showCart={true}
+      transformToRecommendedItem={transformMenuItem}
+      filterItems={customFilterItems}
+      additionalFilterOptions={{
+        restaurants: restaurants,
+        serviceTypes: serviceTypes,
+      }}
+    />
   );
 };

@@ -14,7 +14,7 @@
 
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { X, Loader2, AlertCircle } from "lucide-react";
+import { X, Loader2, AlertCircle, Phone } from "lucide-react";
 import { ChatMessage } from "../../../../components/chat/ChatMessage";
 import { ChatInput } from "../../../../components/chat/ChatInput";
 import { useGuestChat } from "./useGuestChat";
@@ -27,6 +27,7 @@ interface GuestChatModalProps {
   roomNumber: string;
   hotelId: string;
   hotelName: string;
+  receptionPhone?: string | null;
 }
 
 export const GuestChatModal = ({
@@ -37,6 +38,7 @@ export const GuestChatModal = ({
   roomNumber,
   hotelId,
   hotelName,
+  receptionPhone,
 }: GuestChatModalProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -45,6 +47,17 @@ export const GuestChatModal = ({
     guestId,
     hotelId,
   });
+
+  // Log reception phone for debugging
+  useEffect(() => {
+    if (isOpen) {
+      console.log("📞 [GuestChatModal] Reception phone:", receptionPhone);
+      console.log(
+        "📞 [GuestChatModal] Will show phone icon:",
+        !!receptionPhone
+      );
+    }
+  }, [isOpen, receptionPhone]);
 
   // Lock body scroll when modal is open
   useEffect(() => {
@@ -94,13 +107,27 @@ export const GuestChatModal = ({
             <h2 className="text-lg font-semibold truncate">{hotelName}</h2>
             <p className="text-xs text-green-100">Chat with Hotel Staff</p>
           </div>
-          <button
-            onClick={onClose}
-            className="flex-shrink-0 w-8 h-8 flex items-center justify-center hover:bg-white/20 rounded-full transition-colors ml-3"
-            aria-label="Close chat"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {/* Phone Icon */}
+            {receptionPhone && (
+              <a
+                href={`tel:${receptionPhone}`}
+                className="w-8 h-8 flex items-center justify-center hover:bg-white/20 rounded-full transition-colors"
+                aria-label="Call reception"
+                title={`Call: ${receptionPhone}`}
+              >
+                <Phone className="w-5 h-5" />
+              </a>
+            )}
+            {/* Close Button */}
+            <button
+              onClick={onClose}
+              className="w-8 h-8 flex items-center justify-center hover:bg-white/20 rounded-full transition-colors"
+              aria-label="Close chat"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Messages Area */}

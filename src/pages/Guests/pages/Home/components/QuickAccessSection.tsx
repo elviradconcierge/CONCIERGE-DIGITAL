@@ -43,10 +43,6 @@ const defaultItems: QuickAccessItem[] = [
 export const QuickAccessSection = ({
   items = defaultItems,
 }: QuickAccessSectionProps) => {
-  const handleCardClick = (id: string) => {
-    console.log(`🎯 [QuickAccessSection] Card clicked: ${id}`);
-  };
-
   return (
     <div className="px-4 mt-4">
       {/* 2-column grid */}
@@ -56,7 +52,7 @@ export const QuickAccessSection = ({
             key={item.id}
             title={item.title}
             description={item.description}
-            onClick={item.onClick || (() => handleCardClick(item.id))}
+            onClick={item.onClick}
           />
         ))}
       </div>

@@ -23,9 +23,6 @@ export const StayDetailsCard = ({
 }: StayDetailsCardProps) => {
   const [showAccessCode, setShowAccessCode] = useState(false);
 
-  console.log("💳 [StayDetailsCard] Received access code:", accessCode);
-  console.log("💳 [StayDetailsCard] Access code length:", accessCode?.length);
-
   // Format date to match the design (DD/MM/YYYY)
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);

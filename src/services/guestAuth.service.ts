@@ -27,6 +27,7 @@ export interface HotelData {
   name: string;
   city?: string | null;
   country?: string | null;
+  reception_phone?: string | null;
 }
 
 export interface GuestAuthResponse {

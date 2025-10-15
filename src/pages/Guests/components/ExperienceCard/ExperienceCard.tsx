@@ -2,7 +2,10 @@
  * Experience Card Component
  *
  * A modern, reusable card component for displaying experiences (restaurants, tours, activities)
- * Inspired by modern food delivery apps like Lieferando, Uber Eats, etc.
+ *
+ * Refactored to use common components:
+ * - CardImage: Image display with lazy loading
+ * - CardRating: Star rating display
  *
  * Features:
  * - Full-width image with lazy loading
@@ -15,8 +18,9 @@
  * - Mobile-optimized touch targets
  */
 
-import { Star, MapPin, Clock, Heart } from "lucide-react";
-import { useState } from "react";
+import { MapPin, Clock, Heart } from "lucide-react";
+import { CardImage } from "../common/CardImage";
+import { CardRating } from "../common/CardRating";
 
 export interface ExperienceCardProps {
   id: string;
@@ -52,9 +56,6 @@ export const ExperienceCard = ({
   onClick,
   onFavoriteToggle,
 }: ExperienceCardProps) => {
-  const [imageError, setImageError] = useState(false);
-  const [isImageLoading, setIsImageLoading] = useState(true);
-
   // Render price level as dollar signs
   const renderPriceLevel = () => {
     if (!priceLevel) return null;
@@ -71,41 +72,16 @@ export const ExperienceCard = ({
       onClick={onClick}
       className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-100 hover:border-gray-200"
     >
-      {/* Image Container */}
-      <div className="relative w-full h-48 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
-        {/* Image */}
-        {imageUrl && !imageError ? (
-          <>
-            {isImageLoading && (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-8 h-8 border-3 border-blue-600 border-t-transparent rounded-full animate-spin" />
-              </div>
-            )}
-            <img
-              src={imageUrl}
-              alt={title}
-              loading="lazy"
-              onLoad={() => setIsImageLoading(false)}
-              onError={() => {
-                setImageError(true);
-                setIsImageLoading(false);
-              }}
-              className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ${
-                isImageLoading ? "opacity-0" : "opacity-100"
-              }`}
-            />
-          </>
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
-            <div className="text-center">
-              <div className="text-4xl mb-2">🍽️</div>
-              <span className="text-sm text-gray-400">No image</span>
-            </div>
-          </div>
-        )}
-
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+      {/* Image Container with Overlay Badges */}
+      <div className="relative">
+        <CardImage
+          src={imageUrl}
+          alt={title}
+          fallbackEmoji="🍽️"
+          fallbackText="No image"
+          aspectRatio="video"
+          className="h-48"
+        />
 
         {/* Category Badge - Top Left */}
         {category && (
@@ -166,17 +142,7 @@ export const ExperienceCard = ({
         <div className="flex items-center justify-between mb-2">
           {/* Rating */}
           {rating !== undefined && (
-            <div className="flex items-center gap-1.5">
-              <div className="flex items-center gap-0.5">
-                <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                <span className="text-sm font-bold text-gray-900">
-                  {rating}
-                </span>
-              </div>
-              {reviewCount !== undefined && (
-                <span className="text-xs text-gray-500">({reviewCount})</span>
-              )}
-            </div>
+            <CardRating rating={rating} reviewCount={reviewCount} size="md" />
           )}
 
           {/* Price Level or Price */}

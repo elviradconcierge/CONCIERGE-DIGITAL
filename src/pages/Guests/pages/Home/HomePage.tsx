@@ -32,36 +32,20 @@ export const HomePage = ({ guestData, hotelId, onNavigate }: HomePageProps) => {
 
   const [activeCategory, setActiveCategory] = useState<CategoryType>("hotel");
 
-  console.log("🏠 [HomePage] Guest data received:", guestData);
-  console.log("🔑 [HomePage] Verification code:", guestData.verification_code);
-  console.log(
-    "🔑 [HomePage] Verification code length:",
-    guestData.verification_code?.length
-  );
-
   const handleCategoryChange = (category: CategoryType) => {
-    console.log(`🏠 [HomePage] Category changed to: ${category}`);
     setActiveCategory(category);
   };
 
   const handleQuickAccessClick = (cardId: string) => {
-    console.log(`🏠 [HomePage] Quick access card clicked: ${cardId}`);
-
     // Navigate to the corresponding page/tab
     if (cardId === "amenities" && onNavigate) {
-      console.log("✅ [HomePage] Navigating to services page");
       onNavigate("services");
     } else if (cardId === "dine-in" && onNavigate) {
-      console.log("✅ [HomePage] Navigating to dine-in page");
       onNavigate("dine-in");
     } else if (cardId === "hotel-shop" && onNavigate) {
-      console.log("✅ [HomePage] Navigating to shop page");
       onNavigate("shop");
     } else if (cardId === "qna" && onNavigate) {
-      console.log("✅ [HomePage] Navigating to Q&A page");
       onNavigate("qa");
-    } else {
-      console.warn(`⚠️ [HomePage] No navigation handler for: ${cardId}`);
     }
   };
 

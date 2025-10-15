@@ -33,34 +33,16 @@ export const RecommendedSection = ({ hotelId }: RecommendedSectionProps) => {
   // Fetch recommended items from database
   const { data: items = [], isLoading } = useRecommendedItems(hotelId);
 
-  console.log("🎯 [RecommendedSection] Recommended items:", items.length);
-  console.log(
-    "🎯 [RecommendedSection] Modal state - isOpen:",
-    isModalOpen,
-    "selectedItem:",
-    selectedItem?.title
-  );
-
   const handleItemClick = (item: RecommendedItem) => {
-    console.log(`🎯 [RecommendedSection] Item clicked:`, item);
-    console.log(
-      `🎯 [RecommendedSection] Setting selectedItem and opening modal`
-    );
     setSelectedItem(item);
     setIsModalOpen(true);
-    console.log(
-      `🎯 [RecommendedSection] Modal state updated - isOpen: true, item:`,
-      item.title
-    );
   };
 
   const handleCloseModal = () => {
-    console.log(`🚪 [RecommendedSection] Closing modal`);
     setIsModalOpen(false);
     // Small delay before clearing selected item for smooth animation
     setTimeout(() => {
       setSelectedItem(null);
-      console.log(`🚪 [RecommendedSection] Selected item cleared`);
     }, 300);
   };
 
@@ -114,7 +96,6 @@ export const RecommendedSection = ({ hotelId }: RecommendedSectionProps) => {
 
   // Hide section if no items
   if (items.length === 0) {
-    console.log("📭 [RecommendedSection] No recommended items found");
     return null;
   }
 

@@ -25,12 +25,10 @@ export const FloatingWidget = ({
   };
 
   const handleClockClick = () => {
-    console.log("🕐 [FloatingWidget] Clock clicked");
     onClockClick?.();
   };
 
   const handleChatClick = () => {
-    console.log("💬 [FloatingWidget] Chat clicked");
     onChatClick?.();
   };
 

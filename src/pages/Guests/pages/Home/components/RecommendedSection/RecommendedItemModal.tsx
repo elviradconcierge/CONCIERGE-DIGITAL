@@ -44,19 +44,11 @@ export const RecommendedItemModal = ({
   restaurant,
   tour,
 }: RecommendedItemModalProps) => {
-  console.log("🔍 [RecommendedItemModal] Render:", {
-    isOpen,
-    hasItem: !!item,
-    itemTitle: item?.title,
-  });
-
   // Prevent body scroll when modal is open
   useEffect(() => {
     if (isOpen) {
-      console.log("🔒 [RecommendedItemModal] Locking body scroll");
       document.body.style.overflow = "hidden";
     } else {
-      console.log("🔓 [RecommendedItemModal] Unlocking body scroll");
       document.body.style.overflow = "";
     }
 
@@ -66,16 +58,8 @@ export const RecommendedItemModal = ({
   }, [isOpen]);
 
   if (!isOpen || !item) {
-    console.log(
-      "❌ [RecommendedItemModal] Not rendering - isOpen:",
-      isOpen,
-      "hasItem:",
-      !!item
-    );
     return null;
   }
-
-  console.log("✅ [RecommendedItemModal] Rendering modal for:", item.title);
 
   // Get category styling
   const getCategoryStyle = () => {
@@ -179,23 +163,6 @@ export const RecommendedItemModal = ({
           {/* Restaurant Details */}
           {restaurant && (
             <div className="mb-4 space-y-4">
-              {console.log("🍽️ [RecommendedItemModal] Restaurant data:", {
-                hasRestaurant: !!restaurant,
-                name: restaurant.name,
-                place_id: restaurant.place_id,
-                formatted_address: restaurant.formatted_address,
-                vicinity: restaurant.vicinity,
-                rating: restaurant.rating,
-                user_ratings_total: restaurant.user_ratings_total,
-                price_level: restaurant.price_level,
-                formatted_phone_number: restaurant.formatted_phone_number,
-                website: restaurant.website,
-                hasOpeningHours: !!restaurant.opening_hours,
-                weekdayText: restaurant.opening_hours?.weekday_text,
-                hasReviews: !!restaurant.reviews,
-                reviewsCount: restaurant.reviews?.length,
-              })}
-
               {/* Rating & Price Level */}
               {(restaurant.rating || restaurant.price_level) && (
                 <div className="flex items-center gap-4">
@@ -225,32 +192,13 @@ export const RecommendedItemModal = ({
 
               {/* Contact Information */}
               <div className="space-y-2">
-                {console.log("🗺️ [RecommendedItemModal] Address check:", {
-                  hasFormattedAddress: !!restaurant.formatted_address,
-                  formatted_address: restaurant.formatted_address,
-                  hasVicinity: !!restaurant.vicinity,
-                  vicinity: restaurant.vicinity,
-                })}
-
                 {(restaurant.formatted_address || restaurant.vicinity) && (
                   <div className="flex items-start gap-2">
-                    {console.log(
-                      "✅ [RecommendedItemModal] Rendering address with Maps button"
-                    )}
                     <MapPin className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
                     <div className="flex-1 flex items-start justify-between gap-2">
                       <span className="text-sm text-gray-700">
                         {restaurant.formatted_address || restaurant.vicinity}
                       </span>
-                      {console.log(
-                        "🔗 [RecommendedItemModal] Google Maps URL:",
-                        `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                          restaurant.name +
-                            " " +
-                            (restaurant.formatted_address ||
-                              restaurant.vicinity)
-                        )}&query_place_id=${restaurant.place_id}`
-                      )}
                       <a
                         href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
                           restaurant.name +
@@ -262,11 +210,6 @@ export const RecommendedItemModal = ({
                         rel="noopener noreferrer"
                         className="flex-shrink-0 p-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
                         title="Open in Google Maps"
-                        onClick={() =>
-                          console.log(
-                            "🗺️ [RecommendedItemModal] Maps button clicked!"
-                          )
-                        }
                       >
                         <ExternalLink className="w-4 h-4" />
                       </a>
@@ -274,10 +217,6 @@ export const RecommendedItemModal = ({
                   </div>
                 )}
 
-                {!(restaurant.formatted_address || restaurant.vicinity) &&
-                  console.log(
-                    "❌ [RecommendedItemModal] No address available - Maps button not rendered"
-                  )}
                 {restaurant.formatted_phone_number && (
                   <div className="flex items-center gap-2">
                     <Phone className="w-4 h-4 text-blue-600 flex-shrink-0" />

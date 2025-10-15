@@ -47,7 +47,6 @@ export const CategoryMenu = ({ onCategoryChange }: CategoryMenuProps) => {
   const [activeCategory, setActiveCategory] = useState<CategoryType>("hotel");
 
   const handleCategoryClick = (categoryId: CategoryType) => {
-    console.log(`📂 [CategoryMenu] Category selected: ${categoryId}`);
     setActiveCategory(categoryId);
     onCategoryChange?.(categoryId);
   };

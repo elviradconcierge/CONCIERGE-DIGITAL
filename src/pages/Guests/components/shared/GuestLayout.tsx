@@ -20,6 +20,7 @@ interface GuestLayoutProps {
   hotelName: string;
   roomNumber: string;
   hotelId: string;
+  receptionPhone?: string | null;
   isDndActive?: boolean;
   isDndUpdating?: boolean;
   activeTab: NavigationTab;
@@ -35,6 +36,7 @@ export const GuestLayout = ({
   hotelName,
   roomNumber,
   hotelId,
+  receptionPhone,
   isDndActive = false,
   isDndUpdating = false,
   activeTab,
@@ -48,24 +50,18 @@ export const GuestLayout = ({
   const [isChatOpen, setIsChatOpen] = useState(false);
 
   const handleClockClick = () => {
-    console.log(
-      "🕐 [GuestLayout] Clock widget clicked - Opening Request History modal"
-    );
     setIsRequestHistoryOpen(true);
   };
 
   const handleChatClick = () => {
-    console.log("💬 [GuestLayout] Chat widget clicked - Opening chat modal");
     setIsChatOpen(true);
   };
 
   const handleCloseRequestHistory = () => {
-    console.log("🕐 [GuestLayout] Closing Request History modal");
     setIsRequestHistoryOpen(false);
   };
 
   const handleCloseChat = () => {
-    console.log("💬 [GuestLayout] Closing chat modal");
     setIsChatOpen(false);
   };
 
@@ -108,6 +104,7 @@ export const GuestLayout = ({
         roomNumber={roomNumber}
         hotelId={hotelId}
         hotelName={hotelName}
+        receptionPhone={receptionPhone}
       />
 
       {/* Bottom Navigation */}
