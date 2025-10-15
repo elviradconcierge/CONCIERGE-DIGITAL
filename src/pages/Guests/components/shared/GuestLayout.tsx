@@ -93,6 +93,7 @@ export const GuestLayout = ({
       <RequestHistoryModal
         isOpen={isRequestHistoryOpen}
         onClose={handleCloseRequestHistory}
+        guestId={guestId}
       />
 
       {/* Guest Chat Modal */}
