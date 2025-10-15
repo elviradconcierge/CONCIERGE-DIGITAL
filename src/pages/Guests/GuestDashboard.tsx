@@ -1,143 +1,48 @@
 /**
- * Guest Dashboard
+ * Guest Dashboard (Refactored)
  *
  * Main dashboard for authenticated guests.
  * Integrates all pages with shared layout (header, announcements, navigation)
+ *
+ * Refactored into:
+ * - useGuestSession: Session loading, validation, and logout
+ * - useTabNavigation: Tab state and navigation logic
+ * - useDndManagement: Do Not Disturb status management
  */
 
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import {
-  getGuestSession,
-  clearGuestSession,
-  type GuestData,
-  type HotelData,
-} from "../../services/guestAuth.service";
+import { useState } from "react";
+import type { GuestData } from "../../services/guestAuth.service";
 import { GuestLayout, NavigationTab } from "./components/shared";
 import { HomePage, ServicesPage, DineInPage, ShopPage, QAPage } from "./pages";
-import { useUpdateGuestDND } from "../../hooks/queries";
+import { useGuestSession, useTabNavigation, useDndManagement } from "./hooks";
 
 export const GuestDashboard = () => {
-  const navigate = useNavigate();
-  const [guestData, setGuestData] = useState<GuestData | null>(null);
-  const [hotelData, setHotelData] = useState<HotelData | null>(null);
-  const [activeTab, setActiveTab] = useState<NavigationTab>("home");
-  const [isDndActive, setIsDndActive] = useState(false);
+  // Guest session management
+  const { guestData, hotelData, isLoading, handleLogout } = useGuestSession();
 
-  // DND mutation hook
-  const { mutate: updateDND, isPending: isDndUpdating } = useUpdateGuestDND();
+  // Local state for guest data updates (for DND)
+  const [localGuestData, setLocalGuestData] = useState<GuestData | null>(
+    guestData
+  );
 
-  useEffect(() => {
-    console.log("🏠 [Guest Dashboard] Component mounted");
+  // Update local guest data when session loads
+  if (guestData && !localGuestData) {
+    setLocalGuestData(guestData);
+  }
 
-    // Get guest session
-    const session = getGuestSession();
+  // Tab navigation
+  const { activeTab, handleTabChange } = useTabNavigation({
+    onLogout: handleLogout,
+  });
 
-    if (!session || !session.guestData) {
-      console.warn(
-        "⚠️ [Guest Dashboard] No guest session found, redirecting to login"
-      );
-      navigate("/guest");
-      return;
-    }
+  // DND management
+  const { isDndActive, isDndUpdating, handleDndToggle } = useDndManagement({
+    guestData: localGuestData,
+    onGuestDataUpdate: setLocalGuestData,
+  });
 
-    console.log("✅ [Guest Dashboard] Guest session loaded:", {
-      id: session.guestData.id,
-      name: session.guestData.guest_name,
-      room: session.guestData.room_number,
-      hotel_id: session.guestData.hotel_id,
-    });
-    console.log("🏨 [Guest Dashboard] Hotel data:", session.hotelData);
-    console.log(
-      "📞 [Guest Dashboard] Reception phone:",
-      session.hotelData?.reception_phone
-    );
-
-    // Check if access has expired
-    const expiresAt = new Date(session.guestData.access_code_expires_at);
-    const now = new Date();
-
-    if (expiresAt < now) {
-      console.warn("⚠️ [Guest Dashboard] Access code has expired");
-      clearGuestSession();
-      navigate("/guest");
-      return;
-    }
-
-    console.log(
-      "✅ [Guest Dashboard] Access code is valid until:",
-      expiresAt.toISOString()
-    );
-    setGuestData(session.guestData);
-    setHotelData(session.hotelData || null);
-    setIsDndActive(session.guestData.dnd_status || false);
-  }, [navigate]);
-
-  // Log when activeTab changes
-  useEffect(() => {
-    console.log(
-      `🎯 [Guest Dashboard] activeTab state changed to: ${activeTab}`
-    );
-  }, [activeTab]);
-
-  const handleTabChange = (tab: NavigationTab) => {
-    console.log(`📱 [Guest Dashboard] Tab change requested: ${tab}`);
-    console.log(`📱 [Guest Dashboard] Current activeTab: ${activeTab}`);
-
-    if (tab === "logout") {
-      console.log(`🚪 [Guest Dashboard] Logout tab clicked`);
-      handleLogout();
-      return;
-    }
-
-    console.log(`📱 [Guest Dashboard] Setting activeTab to: ${tab}`);
-    setActiveTab(tab);
-  };
-
-  const handleDndToggle = async (isActive: boolean) => {
-    if (!guestData) {
-      console.warn("🔔 [Guest Dashboard] No guest data, cannot toggle DND");
-      return;
-    }
-
-    console.log(`🔔 [Guest Dashboard] DND toggle requested: ${isActive}`);
-
-    // Optimistically update UI
-    setIsDndActive(isActive);
-
-    // Update database
-    updateDND(
-      {
-        guestId: guestData.id,
-        dndStatus: isActive,
-      },
-      {
-        onSuccess: (updatedGuest) => {
-          console.log(
-            "🔔 [Guest Dashboard] DND updated successfully:",
-            updatedGuest
-          );
-          // Update local guest data
-          setGuestData({ ...guestData, dnd_status: updatedGuest.dnd_status });
-        },
-        onError: (error) => {
-          console.error("🔔 [Guest Dashboard] DND update failed:", error);
-          // Revert optimistic update on error
-          setIsDndActive(!isActive);
-          alert("Failed to update Do Not Disturb status. Please try again.");
-        },
-      }
-    );
-  };
-
-  const handleLogout = () => {
-    console.log("🚪 [Guest Dashboard] Logging out...");
-    clearGuestSession();
-    navigate("/guest");
-  };
-
-  if (!guestData) {
-    console.log("⏳ [Guest Dashboard] Loading guest session...");
+  // Loading state
+  if (isLoading || !localGuestData) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
@@ -150,7 +55,7 @@ export const GuestDashboard = () => {
 
   console.log(
     "🎨 [Guest Dashboard] Rendering dashboard for guest:",
-    guestData.guest_name
+    localGuestData.guest_name
   );
 
   // Render the active page
@@ -159,9 +64,9 @@ export const GuestDashboard = () => {
       case "home":
         return (
           <HomePage
-            guestData={guestData}
-            hotelId={guestData.hotel_id}
-            onNavigate={(tab) => setActiveTab(tab as NavigationTab)}
+            guestData={localGuestData}
+            hotelId={localGuestData.hotel_id}
+            onNavigate={(tab) => handleTabChange(tab as NavigationTab)}
           />
         );
       case "services":
@@ -175,9 +80,9 @@ export const GuestDashboard = () => {
       default:
         return (
           <HomePage
-            guestData={guestData}
-            hotelId={guestData.hotel_id}
-            onNavigate={(tab) => setActiveTab(tab as NavigationTab)}
+            guestData={localGuestData}
+            hotelId={localGuestData.hotel_id}
+            onNavigate={(tab) => handleTabChange(tab as NavigationTab)}
           />
         );
     }
@@ -185,11 +90,11 @@ export const GuestDashboard = () => {
 
   return (
     <GuestLayout
-      guestId={guestData.id}
-      guestName={guestData.guest_name}
+      guestId={localGuestData.id}
+      guestName={localGuestData.guest_name}
       hotelName={hotelData?.name || "Hotel"}
-      roomNumber={guestData.room_number}
-      hotelId={guestData.hotel_id}
+      roomNumber={localGuestData.room_number}
+      hotelId={localGuestData.hotel_id}
       receptionPhone={hotelData?.reception_phone}
       isDndActive={isDndActive}
       isDndUpdating={isDndUpdating}
