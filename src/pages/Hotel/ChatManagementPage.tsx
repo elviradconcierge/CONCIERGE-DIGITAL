@@ -9,7 +9,10 @@ import {
 import { ChatInterface } from "../../components/chat";
 import { StaffChatInterface } from "../../components/chat/StaffChatInterface";
 import { useHotel } from "../../contexts/HotelContext";
-import { useGuestConversations } from "../../hooks/queries/hotel-management/guest-conversations";
+import {
+  useGuestConversations,
+  useHotelChatIntegration,
+} from "../../hooks/queries/hotel-management/guest-conversations";
 import {
   useStaffConversations,
   useHotelStaffMembers,
@@ -18,12 +21,15 @@ import {
   transformStaffConversations,
   transformStaffMembersToConversations,
 } from "../../utils/transforms/staffChat.transforms";
+import { useAuth } from "../../hooks/auth/useAuth";
 import type { Conversation } from "../../types";
 
 export const ChatManagementPage = () => {
   const [activeTab, setActiveTab] = useState("guest-communication");
   const { currentHotel } = useHotel();
+  const { user } = useAuth();
   const hotelId = currentHotel?.id || "";
+  const staffProfileId = user?.id || "";
 
   // Fetch guest conversations from database
   const { data: guestConversationsData = [], isLoading: isLoadingGuests } =
@@ -130,9 +136,18 @@ export const ChatManagementPage = () => {
         status: conv.status === "active" ? "online" : "offline",
         type: "guest" as const,
         messages: [],
+        guestId: conv.guest_id, // Add guest_id for translation
       };
     });
   }, [guestConversationsData]);
+
+  // Use the hotel chat integration hook for guest conversations
+  // This handles real-time messages, translation, and database sync
+  const guestChatHook = useHotelChatIntegration({
+    conversations: guestConversations,
+    hotelId,
+    staffProfileId,
+  });
 
   const tabs: Tab[] = [
     {
@@ -147,8 +162,9 @@ export const ChatManagementPage = () => {
             </div>
           ) : (
             <ChatInterface
-              conversations={guestConversations}
+              conversations={guestChatHook.conversations}
               chatType="guest"
+              customChatHook={guestChatHook}
             />
           )}
         </div>

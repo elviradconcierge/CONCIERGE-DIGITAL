@@ -25,6 +25,8 @@ export interface Conversation {
   type: ChatType;
   messages: Message[];
   isExistingConversation?: boolean; // Flag to indicate if conversation already exists
+  guestId?: string; // Guest ID for translation purposes
+  staffId?: string; // Staff ID for staff chat
 }
 
 export interface ChatState {

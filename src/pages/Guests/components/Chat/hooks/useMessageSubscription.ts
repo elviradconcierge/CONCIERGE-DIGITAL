@@ -5,7 +5,9 @@
  */
 
 import { useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "../../../../../lib/supabase";
+import { conversationKeys } from "../../../../../hooks/queries/hotel-management/guest-conversations";
 
 interface UseMessageSubscriptionProps {
   conversationId: string | undefined;
@@ -16,6 +18,8 @@ export const useMessageSubscription = ({
   conversationId,
   onNewMessage,
 }: UseMessageSubscriptionProps) => {
+  const queryClient = useQueryClient();
+
   useEffect(() => {
     if (!conversationId) return;
 
@@ -29,12 +33,14 @@ export const useMessageSubscription = ({
           table: "guest_messages",
           filter: `conversation_id=eq.${conversationId}`,
         },
-        (_payload) => {
+        () => {
+          // Invalidate messages query to trigger refetch
+          queryClient.invalidateQueries({
+            queryKey: conversationKeys.messages(conversationId),
+          });
+
           // Trigger callback if provided
           onNewMessage?.();
-
-          // The useConversationMessages query will auto-refetch
-          // due to React Query's refetch on window focus
         }
       )
       .subscribe();
@@ -42,5 +48,5 @@ export const useMessageSubscription = ({
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [conversationId, onNewMessage]);
+  }, [conversationId, onNewMessage, queryClient]);
 };

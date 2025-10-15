@@ -9,13 +9,17 @@ import { Conversation, Message, ChatType } from "../../types";
 interface ChatInterfaceProps {
   conversations: Conversation[];
   chatType: ChatType;
+  customChatHook?: ReturnType<typeof useChat>; // Allow passing custom hook
 }
 
 export const ChatInterface = ({
-  conversations,
+  conversations: initialConversations,
   chatType,
+  customChatHook,
 }: ChatInterfaceProps) => {
-  const chat = useChat(conversations);
+  // Use custom hook if provided, otherwise use default useChat
+  const defaultChat = useChat(initialConversations);
+  const chat = customChatHook || defaultChat;
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const activeConversation = chat.conversations.find(

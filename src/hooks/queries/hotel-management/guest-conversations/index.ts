@@ -97,3 +97,11 @@ export {
   useUpdateMessage,
   useDeleteMessage,
 } from "./useGuestConversationQueries";
+
+// ============================================================================
+// HOTEL CHAT HOOK EXPORTS (with translation support)
+// ============================================================================
+
+export { useHotelMessageAnalysis } from "./useHotelMessageAnalysis";
+export { useHotelGuestChat } from "./useHotelGuestChat";
+export { useHotelChatIntegration } from "./useHotelChatIntegration";

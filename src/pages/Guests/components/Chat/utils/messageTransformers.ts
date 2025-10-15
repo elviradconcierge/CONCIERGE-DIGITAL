@@ -13,9 +13,15 @@ import type { MessageWithDetails } from "../../../../../hooks/queries/hotel-mana
 export const transformMessage = (msg: MessageWithDetails): Message => {
   const isGuest = msg.sender_type === "guest";
 
+  // For hotel staff messages, show translated text if available (for guest view)
+  // For guest messages, always show original text
+  const displayContent = !isGuest && msg.is_translated && msg.translated_text
+    ? msg.translated_text
+    : msg.message_text;
+
   return {
     id: msg.id,
-    content: msg.message_text,
+    content: displayContent,
     timestamp: new Date(msg.created_at),
     type: isGuest ? "sent" : "received",
     sender: {
