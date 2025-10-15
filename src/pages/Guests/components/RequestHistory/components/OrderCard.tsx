@@ -216,17 +216,17 @@ export const OrderCard = ({ order, onCancel }: OrderCardProps) => {
   return (
     <div className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-sm transition-shadow">
       {/* Card Header - Compact */}
-      <button
-        onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full p-3 flex items-center justify-between gap-2 hover:bg-gray-50 transition-colors"
-      >
-        {/* Order Info */}
-        <div className="flex-1 text-left min-w-0">
+      <div className="w-full p-3 flex items-center justify-between gap-2">
+        {/* Order Info - Clickable to expand */}
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="flex-1 text-left min-w-0 hover:bg-gray-50 transition-colors rounded px-2 py-1 -mx-2 -my-1"
+        >
           <h3 className="font-semibold text-gray-900 text-sm truncate">
             {getOrderTitle()}
           </h3>
           <p className="text-xs text-gray-500 mt-0.5">{getOrderSubtitle()}</p>
-        </div>
+        </button>
 
         {/* Status, Cancel, and Expand */}
         <div className="flex items-center gap-2 flex-shrink-0">
@@ -237,17 +237,24 @@ export const OrderCard = ({ order, onCancel }: OrderCardProps) => {
               disabled={isCancelling}
               className="p-1.5 hover:bg-red-50 rounded-full transition-colors disabled:opacity-50"
               title="Cancel order"
+              aria-label="Cancel order"
             >
               <X className="w-4 h-4 text-red-600" />
             </button>
           )}
-          {isExpanded ? (
-            <ChevronUp className="w-4 h-4 text-gray-400" />
-          ) : (
-            <ChevronDown className="w-4 h-4 text-gray-400" />
-          )}
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
+            aria-label={isExpanded ? "Collapse details" : "Expand details"}
+          >
+            {isExpanded ? (
+              <ChevronUp className="w-4 h-4 text-gray-400" />
+            ) : (
+              <ChevronDown className="w-4 h-4 text-gray-400" />
+            )}
+          </button>
         </div>
-      </button>
+      </div>
 
       {/* Expanded Details - Compact */}
       {isExpanded && (

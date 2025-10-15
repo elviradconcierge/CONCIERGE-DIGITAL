@@ -61,11 +61,6 @@ export const analyzeGuestMessage = async (
   request: MessageAnalysisRequest
 ): Promise<MessageAnalysisResponse> => {
   try {
-    console.log(
-      "🤖 [OpenAI Analyzer] Starting full analysis for message:",
-      request.message_id
-    );
-
     const { data, error } = await supabase.functions.invoke("openai-analyzer", {
       body: {
         task: "full_pipeline",
@@ -81,14 +76,6 @@ export const analyzeGuestMessage = async (
       console.error("❌ [OpenAI Analyzer] Edge function error:", error);
       throw error;
     }
-
-    console.log("✅ [OpenAI Analyzer] Analysis complete:", {
-      sentiment: data.results?.sentiment,
-      urgency: data.results?.urgency,
-      topics: data.results?.topics,
-      translated: data.results?.is_translated,
-      dbUpdate: data.dbUpdate?.ok ? "success" : "failed",
-    });
 
     return data as MessageAnalysisResponse;
   } catch (error) {
@@ -107,10 +94,6 @@ export const translateMessage = async (
   messageId?: string
 ): Promise<string> => {
   try {
-    console.log(
-      `🌐 [OpenAI Translator] Translating from ${originalLanguage} to ${targetLanguage}`
-    );
-
     const { data, error } = await supabase.functions.invoke("openai-analyzer", {
       body: {
         task: "translate",
@@ -123,7 +106,6 @@ export const translateMessage = async (
 
     if (error) throw error;
 
-    console.log("✅ [OpenAI Translator] Translation complete");
     return data.results?.translated_text || text;
   } catch (error) {
     console.error("❌ [OpenAI Translator] Translation failed:", error);
@@ -138,11 +120,6 @@ export const answerGuestQuestion = async (
   request: AnswerQuestionRequest
 ): Promise<string> => {
   try {
-    console.log(
-      "💬 [OpenAI Q&A] Answering question for hotel:",
-      request.hotel_id
-    );
-
     const { data, error } = await supabase.functions.invoke("openai-analyzer", {
       body: {
         task: "answer_question",
@@ -154,7 +131,6 @@ export const answerGuestQuestion = async (
 
     if (error) throw error;
 
-    console.log("✅ [OpenAI Q&A] Answer generated");
     return (
       data.results?.answer ||
       "I'm sorry, I don't have enough information to answer that question."

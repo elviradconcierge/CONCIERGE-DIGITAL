@@ -30,18 +30,10 @@ export const findAvailableStaff = async (
     .single();
 
   if (error) {
-    console.log(
-      "ℹ️ [staffAssignment] No staff found for assignment:",
-      error.message
-    );
     return null;
   }
 
   if (staffData?.user_id) {
-    console.log(
-      "✅ [staffAssignment] Found staff profile for assignment:",
-      staffData.user_id
-    );
     return staffData.user_id; // Return profile ID, not hotel_staff ID
   }
 

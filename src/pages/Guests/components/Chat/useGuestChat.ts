@@ -120,7 +120,7 @@ export const useGuestChat = ({
       sendMessageMutation(
         {
           conversation_id: newConversationId,
-          hotel_id: hotelId, // ✅ Include hotel_id
+          hotel_id: hotelId,
           message_text: content,
           sender_type: "guest",
           guest_id: guestId,
@@ -129,9 +129,6 @@ export const useGuestChat = ({
         {
           onSuccess: (data) => {
             // Trigger AI analysis after message is saved
-            console.log(
-              "✅ [useGuestChat] Message sent, triggering AI analysis"
-            );
             analyzeMessage(data.id, content).catch((error) => {
               console.error(
                 "⚠️ [useGuestChat] AI analysis failed (non-blocking):",
@@ -146,7 +143,7 @@ export const useGuestChat = ({
       sendMessageMutation(
         {
           conversation_id: conversationId,
-          hotel_id: hotelId, // ✅ Include hotel_id
+          hotel_id: hotelId,
           message_text: content,
           sender_type: "guest",
           guest_id: guestId,
@@ -155,9 +152,6 @@ export const useGuestChat = ({
         {
           onSuccess: (data) => {
             // Trigger AI analysis after message is saved
-            console.log(
-              "✅ [useGuestChat] Message sent, triggering AI analysis"
-            );
             analyzeMessage(data.id, content).catch((error) => {
               console.error(
                 "⚠️ [useGuestChat] AI analysis failed (non-blocking):",

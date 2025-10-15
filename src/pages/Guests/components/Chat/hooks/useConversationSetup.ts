@@ -31,12 +31,6 @@ export const useConversationSetup = ({
     // Try to find available staff member (optional - for routing only)
     const assignedStaffId = await findAvailableStaff(hotelId);
 
-    if (!assignedStaffId) {
-      console.log(
-        "ℹ️ [useConversationSetup] No staff member available for assignment - creating conversation anyway (conversation is with hotel, not staff)"
-      );
-    }
-
     return new Promise((resolve, reject) => {
       createConversation(
         {
@@ -48,13 +42,6 @@ export const useConversationSetup = ({
         },
         {
           onSuccess: (newConversation: GuestConversation) => {
-            console.log(
-              "✅ [useConversationSetup] Conversation created successfully:",
-              newConversation.id,
-              assignedStaffId
-                ? `(assigned to staff: ${assignedStaffId})`
-                : "(no staff assigned yet)"
-            );
             onConversationCreated?.(newConversation.id);
             resolve(newConversation.id);
           },

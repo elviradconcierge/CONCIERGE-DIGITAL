@@ -10,9 +10,10 @@ import { ReactNode, useState } from "react";
 import { GuestHeader } from "./GuestHeader";
 import { AnnouncementBanner } from "./AnnouncementBanner";
 import { BottomNavigation, NavigationTab } from "./BottomNavigation";
-import { FloatingWidget } from "./FloatingWidget";
+import { FloatingWidget } from "./FloatingWidget/FloatingWidget";
 import { RequestHistoryModal } from "./RequestHistoryModal";
 import { GuestChatModal } from "../Chat";
+import { useConversationByGuest } from "../../../../hooks/queries/hotel-management/guest-conversations";
 
 interface GuestLayoutProps {
   guestId: string;
@@ -48,6 +49,10 @@ export const GuestLayout = ({
   // Modal state
   const [isRequestHistoryOpen, setIsRequestHistoryOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
+
+  // Fetch conversation to get unread message count
+  const { data: conversation } = useConversationByGuest(guestId, hotelId);
+  const unreadMessageCount = conversation?.unread_count || 0;
 
   const handleClockClick = () => {
     setIsRequestHistoryOpen(true);
@@ -87,6 +92,7 @@ export const GuestLayout = ({
       <FloatingWidget
         onClockClick={handleClockClick}
         onChatClick={handleChatClick}
+        unreadMessageCount={unreadMessageCount}
       />
 
       {/* Request History Modal */}

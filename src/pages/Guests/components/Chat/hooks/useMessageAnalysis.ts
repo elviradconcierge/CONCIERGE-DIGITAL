@@ -68,11 +68,6 @@ export const useMessageAnalysis = ({
           hotelLanguages: hotelResult.data?.official_languages ?? null,
           isReady: true,
         });
-
-        console.log("✅ [Message Analysis] Language config loaded:", {
-          guestLanguage: guestResult.data?.language ?? "unknown",
-          hotelLanguages: hotelResult.data?.official_languages ?? [],
-        });
       } catch (error) {
         console.error(
           "❌ [Message Analysis] Failed to fetch language config:",
@@ -98,9 +93,6 @@ export const useMessageAnalysis = ({
     messageText: string
   ): Promise<void> => {
     if (!config.isReady) {
-      console.log(
-        "⏳ [Message Analysis] Language config not ready yet, skipping analysis"
-      );
       return;
     }
 
@@ -113,13 +105,6 @@ export const useMessageAnalysis = ({
         ? getPrimaryHotelLanguage(config.hotelLanguages)
         : null;
 
-      console.log("🔍 [Message Analysis] Config:", {
-        guestLanguage: config.guestLanguage || "unknown",
-        hotelLanguages: config.hotelLanguages || [],
-        needsTranslation,
-        targetLanguage,
-      });
-
       await analyzeGuestMessage({
         message_id: messageId,
         text: messageText,
@@ -127,8 +112,6 @@ export const useMessageAnalysis = ({
         target_language: targetLanguage,
         hotel_id: hotelId,
       });
-
-      console.log("✅ [Message Analysis] Complete for message:", messageId);
     } catch (error) {
       console.error("❌ [Message Analysis] Failed:", error);
       // Don't throw - analysis failure shouldn't block message sending
