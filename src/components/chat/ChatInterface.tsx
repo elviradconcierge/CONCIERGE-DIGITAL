@@ -69,15 +69,18 @@ export const ChatInterface = ({
                   )}
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    {activeConversation.name}
-                  </h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      {activeConversation.name}
+                    </h3>
+                    {activeConversation.roomNumber && (
+                      <span className="text-sm text-gray-500">
+                        • Room {activeConversation.roomNumber}
+                      </span>
+                    )}
+                  </div>
                   <p className="text-sm text-gray-500">
-                    {activeConversation.status === "online"
-                      ? "Online"
-                      : activeConversation.status === "away"
-                      ? "Away"
-                      : "Offline"}
+                    {activeConversation.lastMessage || "No messages yet"}
                   </p>
                 </div>
               </div>

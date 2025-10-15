@@ -74,6 +74,9 @@ export const useHotelChatIntegration = ({
       ? msg.created_by_profile[0]
       : msg.created_by_profile;
 
+    // Get guest data for room number
+    const guestData = Array.isArray(msg.guests) ? msg.guests[0] : msg.guests;
+
     // Determine which text to display
     let displayContent = msg.message_text;
 
@@ -100,6 +103,7 @@ export const useHotelChatIntegration = ({
             "Hotel Staff"
           : "Guest",
         avatar: undefined,
+        roomNumber: !isHotelMessage ? guestData?.room_number : undefined, // Add room number for guest messages
       },
       // Store additional metadata for display
       originalText: msg.message_text,
@@ -107,13 +111,7 @@ export const useHotelChatIntegration = ({
       isTranslated: msg.is_translated || false,
       sentiment: msg.sentiment,
       urgency: msg.urgency,
-    } as Message & {
-      originalText?: string;
-      translatedText?: string | null;
-      isTranslated?: boolean;
-      sentiment?: string | null;
-      urgency?: string | null;
-    };
+    } as Message;
   });
 
   // Update conversations with fetched messages

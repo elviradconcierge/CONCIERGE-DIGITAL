@@ -137,6 +137,7 @@ export const ChatManagementPage = () => {
         type: "guest" as const,
         messages: [],
         guestId: conv.guest_id, // Add guest_id for translation
+        roomNumber: guestData?.room_number || undefined, // Add room number
       };
     });
   }, [guestConversationsData]);

@@ -100,6 +100,7 @@ export const GenericSidebar = ({
                 onMouseEnter={() => setHoveredItem(item.id)}
                 onMouseLeave={() => setHoveredItem(null)}
                 title={isCollapsed ? item.label : undefined}
+                badgeCount={item.badgeCount}
               />
             );
           })}

@@ -3,6 +3,7 @@ import { GenericDashboardLayout } from "../../components/layout";
 import { PageContainer, PageHeader } from "../../components/common";
 import { HOTEL_NAVIGATION } from "../../constants";
 import { useHotelStaff } from "../../hooks/hotel/useHotelStaff";
+import { useHotelNotifications } from "../../hooks/queries/hotel-management/notifications";
 import { canAccessRoute } from "../../utils/ui/permission";
 import { ChatManagementPage } from "./ChatManagementPage";
 import { GuestManagementPage } from "./GuestManagementPage";
@@ -21,12 +22,27 @@ export const HotelDashboard = () => {
   const [activeSection, setActiveSection] = useState("overview");
   const { hotelStaff } = useHotelStaff();
 
-  // Filter navigation items based on user's role
+  // Fetch notification counts for pending orders
+  const { data: notifications } = useHotelNotifications(hotelStaff?.hotel_id);
+
+  // Filter navigation items based on user's role and add badge counts
   const filteredNavigationItems = useMemo(() => {
     return HOTEL_NAVIGATION.filter((item) =>
       canAccessRoute(hotelStaff, item.id)
-    );
-  }, [hotelStaff]);
+    ).map((item) => {
+      // Add badge counts for specific sections
+      if (item.id === "hotel-shop") {
+        return { ...item, badgeCount: notifications?.shopOrders || 0 };
+      }
+      if (item.id === "hotel-restaurant") {
+        return { ...item, badgeCount: notifications?.dineInOrders || 0 };
+      }
+      if (item.id === "amenities") {
+        return { ...item, badgeCount: notifications?.amenityRequests || 0 };
+      }
+      return item;
+    });
+  }, [hotelStaff, notifications]);
 
   const renderContent = () => {
     switch (activeSection) {

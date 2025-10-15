@@ -1,5 +1,6 @@
 import { LucideIcon } from "lucide-react";
 import { cn } from "../../../utils";
+import { NotificationBadge } from "../NotificationBadge";
 
 interface SidebarButtonProps {
   icon: LucideIcon;
@@ -12,6 +13,7 @@ interface SidebarButtonProps {
   onMouseLeave?: () => void;
   title?: string;
   className?: string;
+  badgeCount?: number; // Notification badge count
 }
 
 export const SidebarButton = ({
@@ -25,6 +27,7 @@ export const SidebarButton = ({
   onMouseLeave,
   title,
   className,
+  badgeCount,
 }: SidebarButtonProps) => {
   return (
     <button
@@ -42,9 +45,19 @@ export const SidebarButton = ({
     >
       <Icon size={18} className="flex-shrink-0" />
       {!isCollapsed && (
-        <span className="text-xs uppercase tracking-wide whitespace-nowrap">
-          {label}
-        </span>
+        <>
+          <span className="text-xs uppercase tracking-wide whitespace-nowrap flex-1">
+            {label}
+          </span>
+          {badgeCount !== undefined && badgeCount > 0 && (
+            <NotificationBadge count={badgeCount} variant="danger" size="sm" />
+          )}
+        </>
+      )}
+      {isCollapsed && badgeCount !== undefined && badgeCount > 0 && (
+        <div className="absolute -top-1 -right-1">
+          <NotificationBadge count={badgeCount} variant="danger" size="sm" />
+        </div>
       )}
       {isActive && (
         <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gray-900" />

@@ -10,7 +10,16 @@ export interface Message {
     id: string;
     name: string;
     avatar?: string;
+    roomNumber?: string; // Guest room number
   };
+  // AI Analysis metadata (for guest messages)
+  sentiment?: string | null;
+  urgency?: string | null;
+  topics?: string[] | null;
+  // Translation metadata
+  isTranslated?: boolean;
+  originalText?: string;
+  translatedText?: string | null;
 }
 
 export interface Conversation {
@@ -27,6 +36,7 @@ export interface Conversation {
   isExistingConversation?: boolean; // Flag to indicate if conversation already exists
   guestId?: string; // Guest ID for translation purposes
   staffId?: string; // Staff ID for staff chat
+  roomNumber?: string; // Guest room number (for hotel staff view)
 }
 
 export interface ChatState {
