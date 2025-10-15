@@ -48,25 +48,12 @@ export const GuestChatModal = ({
     hotelId,
   });
 
-  // Log reception phone for debugging
-  useEffect(() => {
-    if (isOpen) {
-      console.log("📞 [GuestChatModal] Reception phone:", receptionPhone);
-      console.log(
-        "📞 [GuestChatModal] Will show phone icon:",
-        !!receptionPhone
-      );
-    }
-  }, [isOpen, receptionPhone]);
-
   // Lock body scroll when modal is open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
-      console.log("💬 [GuestChatModal] Modal opened - body scroll locked");
     } else {
       document.body.style.overflow = "";
-      console.log("💬 [GuestChatModal] Modal closed - body scroll restored");
     }
 
     return () => {
@@ -82,7 +69,6 @@ export const GuestChatModal = ({
   }, [messages, isOpen]);
 
   const handleSendMessage = async (content: string) => {
-    console.log("📤 [GuestChatModal] Sending message:", content);
     await sendMessage(content);
   };
 

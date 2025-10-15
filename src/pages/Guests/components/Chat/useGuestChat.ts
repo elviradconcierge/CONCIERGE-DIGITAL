@@ -96,11 +96,6 @@ export const useGuestChat = ({
    * Creates conversation if it doesn't exist (with assigned staff)
    */
   const sendMessage = async (content: string) => {
-    console.log("📤 [useGuestChat] Sending message:", {
-      content,
-      conversationId,
-    });
-
     // If no conversation exists, create one first
     if (!conversationId) {
       const newConversationId = await createConversationWithStaff();

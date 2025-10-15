@@ -27,11 +27,6 @@ interface StaffQueryResult {
 export const findAvailableStaff = async (
   hotelId: string
 ): Promise<string | null> => {
-  console.log(
-    "👥 [staffAssignment] Finding available staff for hotel:",
-    hotelId
-  );
-
   // Query hotel staff with Manager or Reception department
   const { data: staffData, error } = await supabase
     .from("hotel_staff")
@@ -61,20 +56,10 @@ export const findAvailableStaff = async (
 
   if (staffData && staffData.length > 0) {
     const staff = staffData[0] as StaffQueryResult;
-    const personalDataArray = staff.hotel_staff_personal_data;
-    const personalData = personalDataArray?.[0];
-
-    console.log("✅ [staffAssignment] Found staff:", {
-      hotel_staff_id: staff.id,
-      name: `${personalData?.first_name} ${personalData?.last_name}`,
-      position: staff.position,
-      department: staff.department,
-    });
 
     // Return hotel_staff.id which will be assigned to guest_conversation.assigned_staff_id
     return staff.id;
   }
 
-  console.warn("⚠️ [staffAssignment] No suitable staff found");
   return null;
 };

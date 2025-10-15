@@ -84,7 +84,6 @@ export const ShopPage = () => {
         onClose={() => setIsCartOpen(false)}
         onCheckoutSuccess={() => {
           // Optional: Show success toast or notification
-          console.log("Order placed successfully!");
         }}
       />
     </>

@@ -25,7 +25,6 @@ export const EmergencyContactsSection = ({
   const activeContacts = contacts?.filter((c) => c.is_active) || [];
 
   const handleCallClick = (contactName: string, phoneNumber: string) => {
-    console.log(`📞 [EmergencyContacts] Calling: ${contactName}`);
     window.location.href = `tel:${phoneNumber}`;
   };
 

@@ -74,10 +74,6 @@ export function ApprovedThirdPartySection({
     cardData: RecommendedItem,
     restaurant: Restaurant
   ) => {
-    console.log(
-      "�️ [ApprovedThirdPartySection] Restaurant clicked:",
-      restaurant
-    );
     setSelectedItem(cardData);
     setSelectedRestaurant(restaurant);
     setSelectedTour(null);
@@ -89,7 +85,6 @@ export function ApprovedThirdPartySection({
     cardData: RecommendedItem,
     tour: AmadeusActivity
   ) => {
-    console.log("🎭 [ApprovedThirdPartySection] Tour clicked:", tour);
     setSelectedItem(cardData);
     setSelectedTour(tour);
     setSelectedRestaurant(null);
@@ -98,7 +93,6 @@ export function ApprovedThirdPartySection({
 
   // Handle modal close
   const handleCloseModal = () => {
-    console.log("🚪 [ApprovedThirdPartySection] Closing modal");
     setIsModalOpen(false);
     setTimeout(() => {
       setSelectedItem(null);
@@ -111,25 +105,11 @@ export function ApprovedThirdPartySection({
   const { data: approvedPlaces = [], isLoading: loadingApproved } =
     useApprovedPlaces(hotelId);
 
-  console.log("🔍 [ApprovedThirdPartySection] Approved places from DB:", {
-    count: approvedPlaces.length,
-    places: approvedPlaces.map((p) => ({
-      place_id: p.place_id,
-      name: p.name,
-      status: p.status,
-    })),
-  });
-
   // Filter only approved items (not rejected or pending)
   const approvedOnly = useMemo(
     () => approvedPlaces.filter((p) => p.status === "approved"),
     [approvedPlaces]
   );
-
-  console.log("✅ [ApprovedThirdPartySection] Approved only:", {
-    count: approvedOnly.length,
-    placeIds: approvedOnly.map((p) => p.place_id),
-  });
 
   // Fetch all nearby restaurants with photos
   const {
@@ -139,11 +119,6 @@ export function ApprovedThirdPartySection({
   } = useNearbyRestaurantsWithStatus({
     hotelId,
     radius: 5000, // 5km radius
-  });
-
-  console.log("🍽️ [ApprovedThirdPartySection] Restaurants fetched:", {
-    count: restaurants.length,
-    placeIds: restaurants.map((r) => r.place_id),
   });
 
   // Fetch all nearby tours with photos
@@ -156,30 +131,12 @@ export function ApprovedThirdPartySection({
     radius: 10, // 10km radius for tours
   });
 
-  console.log("🎭 [ApprovedThirdPartySection] Tours fetched:", {
-    count: tours.length,
-    ids: tours.map((t) => t.id),
-  });
-
   // Filter to get only approved restaurants
   const approvedRestaurants = useMemo(() => {
     const approvedPlaceIds = approvedOnly.map((p) => p.place_id);
 
-    console.log("🔎 [ApprovedThirdPartySection] Filtering restaurants:", {
-      approvedPlaceIds,
-      availablePlaceIds: restaurants.map((r) => r.place_id),
-    });
-
     const filtered = restaurants.filter((restaurant) =>
       approvedPlaceIds.includes(restaurant.place_id)
-    );
-
-    console.log(
-      "✅ [ApprovedThirdPartySection] Approved restaurants matched:",
-      {
-        count: filtered.length,
-        restaurants: filtered.map((r) => ({ id: r.place_id, name: r.name })),
-      }
     );
 
     return filtered;
@@ -189,29 +146,13 @@ export function ApprovedThirdPartySection({
   const approvedTours = useMemo(() => {
     const approvedTourIds = approvedOnly.map((p) => p.place_id);
 
-    console.log("🔎 [ApprovedThirdPartySection] Filtering tours:", {
-      approvedTourIds,
-      availableTourIds: tours.map((t) => t.id),
-    });
-
     const filtered = tours.filter((tour) => approvedTourIds.includes(tour.id));
-
-    console.log("✅ [ApprovedThirdPartySection] Approved tours matched:", {
-      count: filtered.length,
-      tours: filtered.map((t) => ({ id: t.id, name: t.name })),
-    });
 
     return filtered;
   }, [approvedOnly, tours]);
 
   // Combine approved items for display
   const totalApprovedItems = approvedRestaurants.length + approvedTours.length;
-
-  console.log("📊 [ApprovedThirdPartySection] Final results:", {
-    totalApprovedItems,
-    approvedRestaurants: approvedRestaurants.length,
-    approvedTours: approvedTours.length,
-  });
 
   // Auto-scroll effect
   useEffect(() => {

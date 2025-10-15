@@ -51,13 +51,6 @@ export const authenticateGuest = async (
   verificationCode: string
 ): Promise<GuestAuthResponse> => {
   try {
-    console.log("🔐 [Guest Auth] Starting authentication...");
-    console.log("📋 [Guest Auth] Room number:", roomNumber);
-    console.log(
-      "🔑 [Guest Auth] Verification code length:",
-      verificationCode.length
-    );
-
     // Get the Supabase URL for the Edge Function
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
     const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -71,7 +64,6 @@ export const authenticateGuest = async (
     }
 
     const edgeFunctionUrl = `${supabaseUrl}/functions/v1/guest-auth`;
-    console.log("🌐 [Guest Auth] Calling Edge Function:", edgeFunctionUrl);
 
     // Call the guest-auth Edge Function
     const response = await fetch(edgeFunctionUrl, {
@@ -89,49 +81,18 @@ export const authenticateGuest = async (
 
     const result = await response.json();
 
-    console.log("� [Guest Auth] Edge Function response:", {
-      status: response.status,
-      success: result.success,
-      hasToken: !!result.token,
-      hasGuestData: !!result.guestData,
-      hasHotelData: !!result.hotelData,
-    });
-
     if (!response.ok || !result.success) {
-      console.warn("⚠️ [Guest Auth] Authentication failed:", result.error);
       return {
         success: false,
         error: result.error || "Authentication failed",
       };
     }
 
-    console.log("✅ [Guest Auth] Authentication successful!");
-    console.log("👤 [Guest Auth] Guest data:", {
-      id: result.guestData?.id,
-      name: result.guestData?.guest_name,
-      room: result.guestData?.room_number,
-      hotel_id: result.guestData?.hotel_id,
-    });
-    console.log("🏨 [Guest Auth] Hotel data:", result.hotelData);
-
     // Add the verification code to guest data for display purposes
-    console.log("🔑 [Guest Auth] Adding verification code to guest data");
-    console.log("🔑 [Guest Auth] Verification code to add:", verificationCode);
-    console.log(
-      "🔑 [Guest Auth] Verification code length:",
-      verificationCode.length
-    );
-
     const guestDataWithCode = {
       ...result.guestData,
       verification_code: verificationCode,
     };
-
-    console.log("🔑 [Guest Auth] Guest data with code:", guestDataWithCode);
-    console.log(
-      "🔑 [Guest Auth] Verification code in final data:",
-      guestDataWithCode.verification_code
-    );
 
     return {
       success: true,
@@ -161,7 +122,6 @@ export const setGuestSession = (data: {
 }) => {
   if (!data.guestData || !data.token) return;
 
-  console.log("💾 [Guest Auth] Storing guest session in localStorage");
   localStorage.setItem(
     "guest_session",
     JSON.stringify({
@@ -170,7 +130,6 @@ export const setGuestSession = (data: {
       hotelData: data.hotelData,
     })
   );
-  console.log("✅ [Guest Auth] Session stored successfully");
 };
 
 /**
@@ -183,20 +142,11 @@ export const getGuestSession = (): {
 } | null => {
   const session = localStorage.getItem("guest_session");
   if (!session) {
-    console.log("📭 [Guest Auth] No guest session found");
     return null;
   }
 
   try {
     const data = JSON.parse(session);
-    console.log("📬 [Guest Auth] Guest session retrieved:", {
-      hasToken: !!data.token,
-      guestId: data.guestData?.id,
-      room: data.guestData?.room_number,
-      name: data.guestData?.guest_name,
-      hasVerificationCode: !!data.guestData?.verification_code,
-      verificationCode: data.guestData?.verification_code,
-    });
     return data;
   } catch (error) {
     console.error("❌ [Guest Auth] Error parsing guest session:", error);
@@ -208,7 +158,5 @@ export const getGuestSession = (): {
  * Clear guest session from localStorage
  */
 export const clearGuestSession = () => {
-  console.log("🗑️ [Guest Auth] Clearing guest session");
   localStorage.removeItem("guest_session");
-  console.log("✅ [Guest Auth] Session cleared");
 };

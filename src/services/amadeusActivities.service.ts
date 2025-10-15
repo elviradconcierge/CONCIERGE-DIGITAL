@@ -81,7 +81,6 @@ async function getAmadeusCredentials(): Promise<AmadeusApiCredentials> {
     const envClientSecret = import.meta.env.VITE_AMADEUS_CLIENT_SECRET;
 
     if (envClientId && envClientSecret) {
-      console.log("Using Amadeus credentials from environment variables");
       return {
         clientId: envClientId,
         clientSecret: envClientSecret,
@@ -89,7 +88,6 @@ async function getAmadeusCredentials(): Promise<AmadeusApiCredentials> {
     }
 
     // Fallback to Supabase secrets (for production)
-    console.log("Fetching Amadeus credentials from Supabase...");
     const { data, error } = await supabase
       .from("secrets")
       .select("secret_value")

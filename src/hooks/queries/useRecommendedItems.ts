@@ -30,11 +30,6 @@ export const useRecommendedItems = (hotelId: string) => {
   return useQuery({
     queryKey: ["recommended-items", hotelId],
     queryFn: async (): Promise<RecommendedItem[]> => {
-      console.log(
-        "🎯 [useRecommendedItems] Fetching recommended items for hotel:",
-        hotelId
-      );
-
       const recommendedItems: RecommendedItem[] = [];
 
       // Fetch recommended products
@@ -51,10 +46,6 @@ export const useRecommendedItems = (hotelId: string) => {
           productsError
         );
       } else if (products) {
-        console.log(
-          "✅ [useRecommendedItems] Found recommended products:",
-          products.length
-        );
         products.forEach((product) => {
           recommendedItems.push({
             id: product.id,
@@ -82,10 +73,6 @@ export const useRecommendedItems = (hotelId: string) => {
           amenitiesError
         );
       } else if (amenities) {
-        console.log(
-          "✅ [useRecommendedItems] Found recommended amenities:",
-          amenities.length
-        );
         amenities.forEach((amenity) => {
           recommendedItems.push({
             id: amenity.id,
@@ -113,10 +100,6 @@ export const useRecommendedItems = (hotelId: string) => {
           menuItemsError
         );
       } else if (menuItems) {
-        console.log(
-          "✅ [useRecommendedItems] Found recommended menu items:",
-          menuItems.length
-        );
         menuItems.forEach((menuItem) => {
           recommendedItems.push({
             id: menuItem.id,
@@ -130,10 +113,6 @@ export const useRecommendedItems = (hotelId: string) => {
         });
       }
 
-      console.log(
-        "🎯 [useRecommendedItems] Total recommended items:",
-        recommendedItems.length
-      );
       return recommendedItems;
     },
   });

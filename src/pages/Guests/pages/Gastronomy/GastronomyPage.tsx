@@ -151,22 +151,10 @@ export const GastronomyPage = () => {
   const { restaurants: googleRestaurants, isLoading } =
     useApprovedRestaurants(hotelId);
 
-  console.log(
-    "🍽️ [GastronomyPage] Raw Google restaurants:",
-    googleRestaurants.length,
-    googleRestaurants
-  );
-
   // Transform Google Places restaurants to FilterableItem format
   const restaurants: RestaurantItem[] = useMemo(
     () => googleRestaurants.map(transformRestaurantToFilterable),
     [googleRestaurants]
-  );
-
-  console.log(
-    "🍽️ [GastronomyPage] Transformed restaurants:",
-    restaurants.length,
-    restaurants
   );
 
   // Extract unique categories from restaurants
@@ -174,8 +162,6 @@ export const GastronomyPage = () => {
     const cats = Array.from(new Set(restaurants.map((r) => r.category)));
     return cats.length > 0 ? cats : ["Restaurant"];
   }, [restaurants]);
-
-  console.log("🍽️ [GastronomyPage] Categories:", categories);
 
   // Transform RestaurantItem to RecommendedItem for modal
   const transformRestaurantToRecommendedItem = (
@@ -299,13 +285,6 @@ export const GastronomyPage = () => {
         renderCard={renderRestaurantCard}
         filterItems={filterRestaurants}
       />
-
-      {console.log("🍽️ [GastronomyPage] Rendering with:", {
-        restaurantsCount: restaurants.length,
-        isLoading,
-        categories,
-        firstRestaurant: restaurants[0],
-      })}
 
       {/* Restaurant Detail Modal */}
       {selectedRestaurant && (

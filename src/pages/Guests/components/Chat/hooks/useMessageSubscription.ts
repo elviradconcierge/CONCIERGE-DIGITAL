@@ -19,11 +19,6 @@ export const useMessageSubscription = ({
   useEffect(() => {
     if (!conversationId) return;
 
-    console.log(
-      "🔔 [useMessageSubscription] Setting up realtime subscription:",
-      conversationId
-    );
-
     const channel = supabase
       .channel(`guest-chat-${conversationId}`)
       .on(
@@ -34,12 +29,7 @@ export const useMessageSubscription = ({
           table: "guest_messages",
           filter: `conversation_id=eq.${conversationId}`,
         },
-        (_payload: unknown) => {
-          console.log(
-            "✨ [useMessageSubscription] New message received:",
-            _payload
-          );
-
+        (_payload) => {
           // Trigger callback if provided
           onNewMessage?.();
 
@@ -50,9 +40,6 @@ export const useMessageSubscription = ({
       .subscribe();
 
     return () => {
-      console.log(
-        "🔕 [useMessageSubscription] Cleaning up realtime subscription"
-      );
       supabase.removeChannel(channel);
     };
   }, [conversationId, onNewMessage]);

@@ -35,12 +35,6 @@ export const useApprovedThirdPartyItems = (
   return useQuery({
     queryKey: ["approved-third-party-items", hotelId, type],
     queryFn: async (): Promise<ApprovedThirdPartyItem[]> => {
-      console.log(
-        "🎯 [useApprovedThirdPartyItems] Fetching approved items for hotel:",
-        hotelId,
-        type ? `Type: ${type}` : "All types"
-      );
-
       let query = supabase
         .from("hotel_third_party_approvals")
         .select(
@@ -64,11 +58,6 @@ export const useApprovedThirdPartyItems = (
         );
         throw error;
       }
-
-      console.log(
-        "✅ [useApprovedThirdPartyItems] Found approved items:",
-        data?.length || 0
-      );
 
       return data || [];
     },
@@ -108,11 +97,6 @@ export const useApprovedItemsCounts = (hotelId: string) => {
   return useQuery({
     queryKey: ["approved-items-counts", hotelId],
     queryFn: async () => {
-      console.log(
-        "🎯 [useApprovedItemsCounts] Fetching counts for hotel:",
-        hotelId
-      );
-
       const { data, error } = await supabase
         .from("hotel_third_party_approvals")
         .select("third_party_type")
@@ -136,8 +120,6 @@ export const useApprovedItemsCounts = (hotelId: string) => {
           data?.filter((item) => item.third_party_type === "TOUR AGENCY")
             .length || 0,
       };
-
-      console.log("✅ [useApprovedItemsCounts] Counts:", counts);
 
       return counts;
     },

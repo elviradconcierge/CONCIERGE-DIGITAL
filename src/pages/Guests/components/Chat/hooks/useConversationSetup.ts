@@ -28,8 +28,6 @@ export const useConversationSetup = ({
     useCreateConversation();
 
   const createConversationWithStaff = async (): Promise<string | null> => {
-    console.log("🆕 [useConversationSetup] Creating new conversation");
-
     // Find available staff member
     const assignedStaffId = await findAvailableStaff(hotelId);
 
@@ -51,10 +49,6 @@ export const useConversationSetup = ({
         },
         {
           onSuccess: (newConversation: GuestConversation) => {
-            console.log(
-              "✅ [useConversationSetup] Conversation created:",
-              newConversation.id
-            );
             onConversationCreated?.(newConversation.id);
             resolve(newConversation.id);
           },

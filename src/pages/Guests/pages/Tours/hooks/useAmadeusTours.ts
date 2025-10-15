@@ -46,15 +46,8 @@ export const useAmadeusTours = ({
     queryKey: ["amadeus-tours", hotelId, radius],
     queryFn: async (): Promise<AmadeusActivity[]> => {
       if (!hotelLocation?.lat || !hotelLocation?.lng) {
-        console.warn("⚠️ [useAmadeusTours] Hotel location not available");
         return [];
       }
-
-      console.log("🎯 [useAmadeusTours] Fetching tours for hotel:", hotelId, {
-        latitude: hotelLocation.lat,
-        longitude: hotelLocation.lng,
-        radius,
-      });
 
       try {
         const activities = await searchActivities({
@@ -63,7 +56,6 @@ export const useAmadeusTours = ({
           radius,
         });
 
-        console.log("✅ [useAmadeusTours] Found tours:", activities.length);
         return activities;
       } catch (error) {
         console.error("❌ [useAmadeusTours] Error fetching tours:", error);

@@ -62,11 +62,6 @@ export const GuestDashboard = () => {
     );
   }
 
-  console.log(
-    "🎨 [Guest Dashboard] Rendering dashboard for guest:",
-    localGuestData.guest_name
-  );
-
   // Render the active page
   const renderActivePage = () => {
     switch (activeTab) {

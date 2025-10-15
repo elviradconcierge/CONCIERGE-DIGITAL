@@ -30,11 +30,8 @@ export const useDndManagement = ({
 
   const handleDndToggle = async (isActive: boolean) => {
     if (!guestData) {
-      console.warn("🔔 [useDndManagement] No guest data, cannot toggle DND");
       return;
     }
-
-    console.log(`🔔 [useDndManagement] DND toggle requested: ${isActive}`);
 
     // Optimistically update UI
     setIsDndActive(isActive);
@@ -47,10 +44,6 @@ export const useDndManagement = ({
       },
       {
         onSuccess: (updatedGuest) => {
-          console.log(
-            "🔔 [useDndManagement] DND updated successfully:",
-            updatedGuest
-          );
           // Update parent guest data
           onGuestDataUpdate({
             ...guestData,

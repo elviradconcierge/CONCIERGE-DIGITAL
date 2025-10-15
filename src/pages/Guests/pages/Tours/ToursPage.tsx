@@ -92,32 +92,10 @@ export const ToursPage = () => {
     radius: 15, // 15km radius
   });
 
-  console.log(
-    "🎯 [ToursPage] Raw Amadeus tours:",
-    amadeousTours.length,
-    amadeousTours
-  );
-  console.log(
-    "🎯 [ToursPage] Sample prices:",
-    amadeousTours.slice(0, 5).map((t) => ({ name: t.name, price: t.price }))
-  );
-
   // Transform Amadeus tours to FilterableItem format
   const tours: TourItem[] = useMemo(
     () => amadeousTours.map(transformAmadeusToFilterable),
     [amadeousTours]
-  );
-
-  console.log("🎯 [ToursPage] Transformed tours:", tours.length, tours);
-  console.log(
-    "🎯 [ToursPage] Transformed prices:",
-    tours
-      .slice(0, 5)
-      .map((t) => ({
-        name: t.name,
-        price: t.price,
-        originalPrice: t.originalPrice,
-      }))
   );
 
   // Extract unique categories from tours
@@ -125,8 +103,6 @@ export const ToursPage = () => {
     const cats = Array.from(new Set(tours.map((t) => t.category)));
     return cats.length > 0 ? cats : ["Tour"];
   }, [tours]);
-
-  console.log("🎯 [ToursPage] Categories:", categories);
 
   // Transform TourItem to RecommendedItem for modal
   const transformTourToRecommendedItem = (tour: TourItem): RecommendedItem => ({
@@ -244,13 +220,6 @@ export const ToursPage = () => {
         renderCard={renderTourCard}
         filterItems={filterTours}
       />
-
-      {console.log("🎯 [ToursPage] Rendering with:", {
-        toursCount: tours.length,
-        isLoading,
-        categories,
-        firstTour: tours[0],
-      })}
 
       {/* Tour Detail Modal */}
       {selectedTour && (

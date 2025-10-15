@@ -23,8 +23,6 @@ export function useHotelSettings(hotelId: string) {
   return useQuery<HotelSetting[]>({
     queryKey: ["hotel-settings", hotelId],
     queryFn: async () => {
-      console.log("[useHotelSettings] Fetching settings for hotelId:", hotelId);
-
       const { data, error } = await supabase
         .from("hotel_settings")
         .select("*")
@@ -36,7 +34,6 @@ export function useHotelSettings(hotelId: string) {
         throw error;
       }
 
-      console.log("[useHotelSettings] Fetched settings:", data);
       return data || [];
     },
     enabled: !!hotelId,

@@ -298,10 +298,6 @@ export const parseGeographyToLatLng = (
   geography: string
 ): PlaceLocation | null => {
   try {
-    console.log("Parsing geography:", geography);
-    console.log("Geography type:", typeof geography);
-    console.log("Geography length:", geography?.length);
-
     // PostGIS POINT geography WKB format:
     // 01 01000020 E6100000 [16 hex for X] [16 hex for Y]
     // Total header: 1+4+4 = 9 bytes = 18 hex chars
@@ -313,14 +309,9 @@ export const parseGeographyToLatLng = (
     const lngHex = coordsHex.slice(0, 16);
     const latHex = coordsHex.slice(16, 32);
 
-    console.log("Longitude hex:", lngHex);
-    console.log("Latitude hex:", latHex);
-
     // Convert hex to double (little-endian)
     const lng = hexToDouble(lngHex);
     const lat = hexToDouble(latHex);
-
-    console.log("Parsed coordinates:", { lat, lng });
 
     if (isNaN(lng) || isNaN(lat) || Math.abs(lng) > 180 || Math.abs(lat) > 90) {
       console.error("Invalid coordinates parsed from geography:", { lat, lng });

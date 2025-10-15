@@ -42,20 +42,12 @@ export const useMessageHandling = ({
       // Count unread staff messages
       const unread = countUnreadStaffMessages(messagesData);
       setUnreadCount(unread);
-
-      console.log("💬 [useMessageHandling] Messages loaded:", {
-        total: transformed.length,
-        unread,
-        conversationId,
-      });
     }
   }, [messagesData, conversationId]);
 
   // Mark messages as read when chat is viewed
   useEffect(() => {
     if (conversationId && unreadCount > 0 && messagesData) {
-      console.log("✅ [useMessageHandling] Marking messages as read");
-
       const messageIds = getUnreadMessageIds(messagesData);
 
       markAsRead({
