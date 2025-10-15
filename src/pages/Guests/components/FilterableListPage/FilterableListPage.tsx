@@ -155,37 +155,15 @@ export function FilterableListPage<T extends FilterableItem>({
     const activeItems = items.filter((item) => item.is_active !== false);
     const itemsToShow = activeItems.length > 0 ? activeItems : items;
 
-    console.log(
-      "🔍 [FilterableListPage] Active items:",
-      activeItems.length,
-      "Total items:",
-      items.length
-    );
-
     // Apply custom or default filtering
     const filtered = filterItems
       ? filterItems(itemsToShow, filters, searchQuery)
       : defaultFilterItems(itemsToShow, filters, searchQuery);
 
-    console.log(
-      "🔍 [FilterableListPage] After filtering:",
-      filtered.length,
-      "Search:",
-      searchQuery,
-      "Filters:",
-      filters
-    );
-
     // Apply custom or default grouping
     const grouped = groupItems
       ? groupItems(filtered)
       : defaultGroupItems(filtered);
-
-    console.log(
-      "🔍 [FilterableListPage] Grouped items:",
-      Object.keys(grouped),
-      grouped
-    );
 
     return grouped;
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -198,28 +176,62 @@ export function FilterableListPage<T extends FilterableItem>({
   };
 
   // Default card renderer
-  const defaultRenderCard = (item: T) => (
-    <MenuItemCard
-      key={item.id}
-      id={item.id}
-      title={item.name}
-      description={item.description || undefined}
-      imageUrl={item.image_url || undefined}
-      price={`$${item.price.toFixed(2)}`}
-      isAvailable={item.is_active !== false}
-      isRecommended={item.hotel_recommended || false}
-      onClick={() => handleCardClick(item)}
-      showCartButton={true}
-      itemType={
-        item.category?.toLowerCase().includes("shop") ||
-        item.category?.toLowerCase().includes("product")
-          ? "product"
-          : "food"
+  const defaultRenderCard = (item: T) => {
+    // Determine service type from service_type array (for menu items)
+    let serviceType: "restaurant_booking" | "room_service" | undefined;
+    if (
+      "service_type" in item &&
+      item.service_type &&
+      Array.isArray(item.service_type)
+    ) {
+      const types = item.service_type as string[];
+      // Match actual database values: "Restaurant" -> restaurant_booking, "Room Service" -> room_service
+      if (types.some((t) => t.toLowerCase().includes("restaurant"))) {
+        serviceType = "restaurant_booking";
+      } else if (types.some((t) => t.toLowerCase().includes("room service"))) {
+        serviceType = "room_service";
       }
-      numericPrice={item.price}
-      category={item.category}
-    />
-  );
+    }
+
+    // Extract restaurant ID from restaurant_ids array
+    let restaurantId: string | undefined;
+    if (
+      "restaurant_ids" in item &&
+      item.restaurant_ids &&
+      Array.isArray(item.restaurant_ids)
+    ) {
+      const ids = item.restaurant_ids as string[];
+      restaurantId = ids.length > 0 ? ids[0] : undefined;
+    }
+
+    return (
+      <MenuItemCard
+        key={item.id}
+        id={item.id}
+        title={item.name}
+        description={item.description || undefined}
+        imageUrl={item.image_url || undefined}
+        price={`$${item.price.toFixed(2)}`}
+        isAvailable={item.is_active !== false}
+        isRecommended={item.hotel_recommended || false}
+        onClick={() => handleCardClick(item)}
+        showCartButton={true}
+        itemType={
+          // Determine item type based on category or presence of specific fields
+          item.category?.toLowerCase().includes("shop") ||
+          item.category?.toLowerCase().includes("product")
+            ? "product"
+            : "service_type" in item && item.service_type
+            ? "food"
+            : "service"
+        }
+        numericPrice={item.price}
+        category={item.category}
+        serviceType={serviceType}
+        restaurantId={restaurantId}
+      />
+    );
+  };
 
   // Loading state
   if (isLoading) {

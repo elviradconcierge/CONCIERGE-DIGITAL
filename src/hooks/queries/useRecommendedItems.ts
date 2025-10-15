@@ -16,6 +16,7 @@ export interface RecommendedItem {
   price?: number;
   imageUrl?: string;
   category?: string;
+  serviceType?: "restaurant_booking" | "room_service"; // For menu items
 }
 
 /**

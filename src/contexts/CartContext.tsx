@@ -19,9 +19,11 @@ export interface CartItem {
   price: number;
   quantity: number;
   image_url?: string | null;
-  type: "food" | "product";
+  type: "food" | "product" | "service";
   description?: string | null;
   category?: string;
+  serviceType?: "restaurant_booking" | "room_service"; // Only for food items
+  restaurantId?: string; // Restaurant ID for food items
 }
 
 interface CartContextType {
@@ -30,14 +32,19 @@ interface CartContextType {
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
-  clearCartByType: (type: "food" | "product") => void;
+  clearCartByType: (type: "food" | "product" | "service") => void;
   getItemQuantity: (id: string) => number;
   getTotalItems: () => number;
-  getTotalItemsByType: (type: "food" | "product") => number;
+  getTotalItemsByType: (type: "food" | "product" | "service") => number;
   getTotalPrice: () => number;
-  getTotalPriceByType: (type: "food" | "product") => number;
+  getTotalPriceByType: (type: "food" | "product" | "service") => number;
   isCartEmpty: () => boolean;
-  getItemsByType: (type: "food" | "product") => CartItem[];
+  getItemsByType: (type: "food" | "product" | "service") => CartItem[];
+  canAddFoodItem: (serviceType: "restaurant_booking" | "room_service") => {
+    canAdd: boolean;
+    existingServiceType?: "restaurant_booking" | "room_service";
+  };
+  getFoodServiceType: () => "restaurant_booking" | "room_service" | null;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -150,6 +157,46 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
     return items.length === 0;
   }, [items]);
 
+  /**
+   * Check if a food item with the given service type can be added to cart
+   * Returns false if cart already has food items with a different service type
+   */
+  const canAddFoodItem = useCallback(
+    (serviceType: "restaurant_booking" | "room_service") => {
+      const foodItems = items.filter((item) => item.type === "food");
+
+      if (foodItems.length === 0) {
+        return { canAdd: true };
+      }
+
+      const existingServiceType = foodItems[0].serviceType;
+
+      if (!existingServiceType) {
+        return { canAdd: true };
+      }
+
+      return {
+        canAdd: existingServiceType === serviceType,
+        existingServiceType,
+      };
+    },
+    [items]
+  );
+
+  /**
+   * Get the current service type of food items in cart
+   * Returns null if no food items in cart
+   */
+  const getFoodServiceType = useCallback(() => {
+    const foodItems = items.filter((item) => item.type === "food");
+
+    if (foodItems.length === 0) {
+      return null;
+    }
+
+    return foodItems[0].serviceType || null;
+  }, [items]);
+
   return (
     <CartContext.Provider
       value={{
@@ -166,6 +213,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
         getTotalPriceByType,
         getItemsByType,
         isCartEmpty,
+        canAddFoodItem,
+        getFoodServiceType,
       }}
     >
       {children}

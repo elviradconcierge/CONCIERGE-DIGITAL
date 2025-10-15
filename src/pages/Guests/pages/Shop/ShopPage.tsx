@@ -4,6 +4,7 @@
  * Hotel merchandise and products - displays products in a compact mobile-friendly format
  */
 
+import { useState } from "react";
 import { FilterableListPage } from "../../components/FilterableListPage";
 import { useGuestHotelId } from "../../hooks";
 import {
@@ -14,11 +15,13 @@ import { useProductCategories } from "../../../../hooks/queries/hotel-management
 import type { RecommendedItem } from "../../../../hooks/queries";
 import { MenuItemCard } from "../../components/MenuItemCard";
 import { useCart } from "../../../../contexts/CartContext";
+import { ShopCartBottomSheet } from "../../components/ShopCart";
 
 export const ShopPage = () => {
   const hotelId = useGuestHotelId();
   const { getTotalItemsByType } = useCart();
   const cartItemCount = getTotalItemsByType("product");
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   // Fetch data
   const { data: products = [], isLoading } = useProducts(hotelId);
@@ -35,7 +38,7 @@ export const ShopPage = () => {
     category: product.category,
   });
 
-  // Custom card renderer with stock quantity tag
+  // Custom card renderer
   const renderProductCard = (
     product: Product,
     onClick: (item: Product) => void
@@ -47,7 +50,6 @@ export const ShopPage = () => {
       description={product.description || undefined}
       imageUrl={product.image_url || undefined}
       price={`$${product.price.toFixed(2)}`}
-      tags={product.stock_quantity ? [`Stock: ${product.stock_quantity}`] : []}
       isAvailable={product.is_active && (product.stock_quantity || 0) > 0}
       isRecommended={product.hotel_recommended || false}
       onClick={() => onClick(product)}
@@ -59,21 +61,32 @@ export const ShopPage = () => {
   );
 
   return (
-    <FilterableListPage
-      searchPlaceholder="Search products..."
-      emptyStateConfig={{
-        emoji: "🛍️",
-        title: "No products available",
-        message: "Please check back later or contact the front desk",
-      }}
-      items={products}
-      isLoading={isLoading}
-      categories={categories}
-      cartItemCount={cartItemCount}
-      onCartClick={() => {}}
-      showCart={true}
-      transformToRecommendedItem={transformProduct}
-      renderCard={renderProductCard}
-    />
+    <>
+      <FilterableListPage
+        searchPlaceholder="Search products..."
+        emptyStateConfig={{
+          emoji: "🛍️",
+          title: "No products available",
+          message: "Please check back later or contact the front desk",
+        }}
+        items={products}
+        isLoading={isLoading}
+        categories={categories}
+        cartItemCount={cartItemCount}
+        onCartClick={() => setIsCartOpen(true)}
+        showCart={true}
+        transformToRecommendedItem={transformProduct}
+        renderCard={renderProductCard}
+      />
+
+      <ShopCartBottomSheet
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        onCheckoutSuccess={() => {
+          // Optional: Show success toast or notification
+          console.log("Order placed successfully!");
+        }}
+      />
+    </>
   );
 };

@@ -13,6 +13,7 @@
 import { useState } from "react";
 import { Star } from "lucide-react";
 import { AddToCartButton } from "../cart";
+import { useCart } from "../../../../contexts/CartContext";
 
 export interface MenuItemCardProps {
   id: string;
@@ -29,6 +30,8 @@ export interface MenuItemCardProps {
   showCartButton?: boolean;
   itemType?: "food" | "product";
   numericPrice?: number; // For cart functionality
+  serviceType?: "restaurant_booking" | "room_service"; // For food items
+  restaurantId?: string; // Restaurant ID for food items
 }
 
 export const MenuItemCard = ({
@@ -45,8 +48,23 @@ export const MenuItemCard = ({
   showCartButton = false,
   itemType = "food",
   numericPrice,
+  serviceType,
+  restaurantId,
 }: MenuItemCardProps) => {
   const [imageError, setImageError] = useState(false);
+  const { canAddFoodItem } = useCart();
+
+  // Check if this item conflicts with cart
+  const serviceTypeConflict =
+    itemType === "food" && serviceType && showCartButton
+      ? !canAddFoodItem(serviceType).canAdd
+      : false;
+
+  // Get existing service type for warning message
+  const existingServiceType =
+    itemType === "food" && serviceType && showCartButton
+      ? canAddFoodItem(serviceType).existingServiceType
+      : undefined;
 
   const handleCardClick = () => {
     // Only trigger onClick if not clicking the cart button
@@ -100,7 +118,9 @@ export const MenuItemCard = ({
               itemDescription={description}
               itemCategory={category}
               size="sm"
-              disabled={!isAvailable}
+              disabled={!isAvailable || serviceTypeConflict}
+              serviceType={serviceType}
+              restaurantId={restaurantId}
             />
           </div>
         )}
@@ -132,6 +152,17 @@ export const MenuItemCard = ({
           {description && (
             <p className="text-xs text-gray-600 line-clamp-2 mb-2 leading-relaxed">
               {description}
+            </p>
+          )}
+
+          {/* Service Type Conflict Warning */}
+          {serviceTypeConflict && existingServiceType && (
+            <p className="text-xs text-red-600 font-medium mb-2">
+              ⚠️ Cart has{" "}
+              {existingServiceType === "restaurant_booking"
+                ? "restaurant"
+                : "room service"}{" "}
+              items
             </p>
           )}
         </div>

@@ -20,11 +20,13 @@ interface AddToCartButtonProps {
   itemName: string;
   itemPrice: number;
   itemImage?: string | null;
-  itemType: "food" | "product";
+  itemType: "food" | "product" | "service";
   itemDescription?: string | null;
   itemCategory?: string;
   size?: "sm" | "md" | "lg";
   disabled?: boolean;
+  serviceType?: "restaurant_booking" | "room_service"; // For food items only
+  restaurantId?: string; // Restaurant ID for food items
 }
 
 export const AddToCartButton = ({
@@ -37,8 +39,16 @@ export const AddToCartButton = ({
   itemCategory,
   size = "md",
   disabled = false,
+  serviceType,
+  restaurantId,
 }: AddToCartButtonProps) => {
-  const { addItem, updateQuantity, getItemQuantity } = useCart();
+  const {
+    addItem,
+    updateQuantity,
+    getItemQuantity,
+    removeItem,
+    canAddFoodItem,
+  } = useCart();
   const quantity = getItemQuantity(itemId);
 
   const handleAdd = (e: React.MouseEvent) => {
@@ -46,6 +56,16 @@ export const AddToCartButton = ({
     e.preventDefault();
 
     if (disabled) return;
+
+    // Validate service type for food items
+    if (itemType === "food" && serviceType && quantity === 0) {
+      const validation = canAddFoodItem(serviceType);
+
+      if (!validation.canAdd) {
+        // Visual warning is already shown in the card, just prevent adding
+        return;
+      }
+    }
 
     if (quantity === 0) {
       addItem({
@@ -56,6 +76,8 @@ export const AddToCartButton = ({
         type: itemType,
         description: itemDescription,
         category: itemCategory,
+        serviceType: itemType === "food" ? serviceType : undefined,
+        restaurantId: itemType === "food" ? restaurantId : undefined,
       });
     } else {
       updateQuantity(itemId, quantity + 1);
@@ -101,6 +123,41 @@ export const AddToCartButton = ({
     md: "min-w-[80px]",
     lg: "min-w-[90px]",
   };
+
+  // For service items, show simple "Added" or "Add" button
+  if (itemType === "service") {
+    const isAdded = quantity > 0;
+    return (
+      <button
+        onClick={isAdded ? () => removeItem(itemId) : handleAdd}
+        disabled={disabled}
+        className={`
+          ${sizeClasses[size]}
+          ${
+            disabled
+              ? "bg-gray-300 cursor-not-allowed"
+              : isAdded
+              ? "bg-green-500 hover:bg-red-500"
+              : "bg-white hover:bg-[#8B5CF6]"
+          }
+          ${isAdded ? "text-white" : "text-[#8B5CF6] hover:text-white"}
+          rounded-full
+          font-semibold text-xs
+          transition-all duration-200
+          shadow-lg hover:shadow-xl
+          transform ${disabled ? "" : "hover:scale-110 active:scale-95"}
+          flex items-center justify-center gap-1
+          border ${
+            isAdded
+              ? "border-green-600"
+              : "border-gray-200 hover:border-[#8B5CF6]"
+          }
+        `}
+      >
+        {isAdded ? "Added ✓" : "Add"}
+      </button>
+    );
+  }
 
   // If quantity is 0, show compact "+" button
   if (quantity === 0) {

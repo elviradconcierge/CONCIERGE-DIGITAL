@@ -15,24 +15,11 @@ interface AboutUsSectionProps {
 }
 
 export const AboutUsSection = ({ hotelId }: AboutUsSectionProps) => {
-  console.log("🏨 [AboutUs] Component rendered with hotelId:", hotelId);
-
   // Fetch hotel settings from database
   const { data: settings, isLoading, error } = useHotelSettings(hotelId);
 
-  console.log("🏨 [AboutUs] Settings loading state:", isLoading);
-  console.log("🏨 [AboutUs] Settings data:", settings);
-  console.log("🏨 [AboutUs] Settings error:", error);
-
   // Find the about section setting
   const aboutSetting = settings?.find((s) => s.setting_key === "aboutSection");
-
-  console.log("🏨 [AboutUs] About setting found:", aboutSetting);
-  console.log("🏨 [AboutUs] about_us value:", aboutSetting?.about_us);
-  console.log(
-    "🏨 [AboutUs] about_us_button value:",
-    aboutSetting?.about_us_button
-  );
 
   // Parse button data (could be JSON with text and URL)
   const parseButtonData = (
@@ -59,20 +46,14 @@ export const AboutUsSection = ({ hotelId }: AboutUsSectionProps) => {
     aboutSetting?.about_us ||
     "Located one kilometer from Munich Central Station, two kilometers from the Theresienwiese U-Bahn station, and 36 kilometers from Munich International Airport (MUC), Centro Hotel Mondial München, Trademark Collection by Wyndham welcomes you with free Wi-Fi, a breakfast buffet, and paid on-site parking.";
 
-  console.log("🏨 [AboutUs] Button config:", buttonConfig);
-  console.log("🏨 [AboutUs] Description:", description);
-
   const handleBookingClick = () => {
-    console.log("🏨 [AboutUs] Booking button clicked");
     if (buttonConfig.url) {
-      console.log("🏨 [AboutUs] Opening URL:", buttonConfig.url);
       window.open(buttonConfig.url, "_blank");
     }
   };
 
   // Loading state
   if (isLoading) {
-    console.log("🏨 [AboutUs] Rendering loading state");
     return (
       <div className="mt-8">
         <div className="bg-gray-900 p-6 sm:p-8">
@@ -87,8 +68,6 @@ export const AboutUsSection = ({ hotelId }: AboutUsSectionProps) => {
       </div>
     );
   }
-
-  console.log("🏨 [AboutUs] Rendering About Us section");
 
   return (
     <div className="mt-8">

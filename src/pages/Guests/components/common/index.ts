@@ -9,3 +9,5 @@ export type { SearchBarProps } from "./SearchBar/types";
 
 export { FilterModal } from "./FilterModal";
 export type { FilterOptions, FilterModalProps } from "./FilterModal/types";
+
+export { BottomSheet } from "./BottomSheet";

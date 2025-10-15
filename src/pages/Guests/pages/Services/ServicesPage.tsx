@@ -2,10 +2,13 @@
  * Services Page
  *
  * Hotel amenities and services - displays amenities in a compact mobile-friendly format
+ * Features cart functionality for requesting services
  */
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { FilterableListPage } from "../../components/FilterableListPage";
+import { ServicesCartBottomSheet } from "../../components/ServicesCart/ServicesCartBottomSheet";
+import { useCart } from "../../../../contexts/CartContext";
 import { useGuestHotelId } from "../../hooks";
 import {
   useAmenities,
@@ -16,9 +19,14 @@ import type { RecommendedItem } from "../../../../hooks/queries";
 
 export const ServicesPage = () => {
   const hotelId = useGuestHotelId();
+  const { getTotalItemsByType } = useCart();
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   // Fetch data
   const { data: amenities = [], isLoading } = useAmenities(hotelId);
+
+  // Cart items count
+  const cartItemCount = getTotalItemsByType("service");
 
   // Calculate filter options
   const categories = useMemo(() => getUniqueCategories(amenities), [amenities]);
@@ -35,17 +43,30 @@ export const ServicesPage = () => {
   });
 
   return (
-    <FilterableListPage
-      searchPlaceholder="Search services..."
-      emptyStateConfig={{
-        emoji: "🏊",
-        title: "No services available",
-        message: "Please check back later or contact the front desk",
-      }}
-      items={amenities}
-      isLoading={isLoading}
-      categories={categories}
-      transformToRecommendedItem={transformAmenity}
-    />
+    <>
+      <FilterableListPage
+        searchPlaceholder="Search services..."
+        emptyStateConfig={{
+          emoji: "🏊",
+          title: "No services available",
+          message: "Please check back later or contact the front desk",
+        }}
+        items={amenities}
+        isLoading={isLoading}
+        categories={categories}
+        transformToRecommendedItem={transformAmenity}
+        showCart={true}
+        cartItemCount={cartItemCount}
+        onCartClick={() => setIsCartOpen(true)}
+      />
+
+      <ServicesCartBottomSheet
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        onCheckoutSuccess={() => {
+          // Optional: Show success message or refresh data
+        }}
+      />
+    </>
   );
 };

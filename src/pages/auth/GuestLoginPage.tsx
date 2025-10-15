@@ -19,63 +19,28 @@ export const GuestLoginPage = () => {
     setError("");
     setIsLoading(true);
 
-    console.log("🚀 [Guest Login Page] Form submitted");
-    console.log("📝 [Guest Login Page] Room number:", roomNumber);
-    console.log(
-      "📝 [Guest Login Page] Access code provided:",
-      accessCode ? "Yes" : "No"
-    );
-
     try {
       // Authenticate the guest using room number and verification code
-      console.log("🔐 [Guest Login Page] Calling authentication service...");
       const result = await authenticateGuest(roomNumber, accessCode);
 
-      console.log("📊 [Guest Login Page] Authentication result:", {
-        success: result.success,
-        hasToken: !!result.token,
-        hasGuestData: !!result.guestData,
-        error: result.error,
-      });
-
       if (result.success && result.guestData && result.token) {
-        console.log("✅ [Guest Login Page] Authentication successful!");
-        console.log("👤 [Guest Login Page] Authenticated guest:", {
-          id: result.guestData.id,
-          name: result.guestData.guest_name,
-          room: result.guestData.room_number,
-          hotel_id: result.guestData.hotel_id,
-        });
-        console.log(
-          "🔑 [Guest Login Page] Verification code in result:",
-          result.guestData.verification_code
-        );
-        console.log("🏨 [Guest Login Page] Hotel:", result.hotelData);
-
         // Store the guest session
-        console.log(
-          "💾 [Guest Login Page] Storing session with guest data:",
-          result.guestData
-        );
         setGuestSession({
           token: result.token,
           guestData: result.guestData,
           hotelData: result.hotelData,
         });
 
-        console.log("🧭 [Guest Login Page] Navigating to guest dashboard...");
         // Navigate to guest dashboard
         navigate("/guest/dashboard");
       } else {
-        console.warn("⚠️ [Guest Login Page] Authentication failed");
         setError(result.error || "Invalid room number or access code");
       }
     } catch (err) {
-      console.error("💥 [Guest Login Page] Unexpected error:", err);
+      console.error("💥 [Guest Login] Authentication error:", err);
       setError("An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false);
-      console.log("🏁 [Guest Login Page] Authentication process completed");
     }
   };
 
