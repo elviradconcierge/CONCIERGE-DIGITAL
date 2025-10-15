@@ -89,6 +89,7 @@ export const HomePage = ({ guestData, hotelId, onNavigate }: HomePageProps) => {
             id: "tours",
             title: "Tours",
             description: "Explore the city with guided tours",
+            onClick: () => onNavigate?.("tours"),
           },
         ];
       case "currency":

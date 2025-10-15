@@ -155,13 +155,39 @@ export function FilterableListPage<T extends FilterableItem>({
     const activeItems = items.filter((item) => item.is_active !== false);
     const itemsToShow = activeItems.length > 0 ? activeItems : items;
 
+    console.log(
+      "🔍 [FilterableListPage] Active items:",
+      activeItems.length,
+      "Total items:",
+      items.length
+    );
+
     // Apply custom or default filtering
     const filtered = filterItems
       ? filterItems(itemsToShow, filters, searchQuery)
       : defaultFilterItems(itemsToShow, filters, searchQuery);
 
+    console.log(
+      "🔍 [FilterableListPage] After filtering:",
+      filtered.length,
+      "Search:",
+      searchQuery,
+      "Filters:",
+      filters
+    );
+
     // Apply custom or default grouping
-    return groupItems ? groupItems(filtered) : defaultGroupItems(filtered);
+    const grouped = groupItems
+      ? groupItems(filtered)
+      : defaultGroupItems(filtered);
+
+    console.log(
+      "🔍 [FilterableListPage] Grouped items:",
+      Object.keys(grouped),
+      grouped
+    );
+
+    return grouped;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items, filters, searchQuery, filterItems, groupItems]);
 

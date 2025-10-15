@@ -13,7 +13,14 @@
 import { useState } from "react";
 import type { GuestData } from "../../services/guestAuth.service";
 import { GuestLayout, NavigationTab } from "./components/shared";
-import { HomePage, ServicesPage, DineInPage, ShopPage, QAPage } from "./pages";
+import {
+  HomePage,
+  ServicesPage,
+  DineInPage,
+  ShopPage,
+  QAPage,
+  ToursPage,
+} from "./pages";
 import { useGuestSession, useTabNavigation, useDndManagement } from "./hooks";
 
 export const GuestDashboard = () => {
@@ -75,6 +82,8 @@ export const GuestDashboard = () => {
         return <DineInPage />;
       case "shop":
         return <ShopPage />;
+      case "tours":
+        return <ToursPage />;
       case "qa":
         return <QAPage />;
       default:

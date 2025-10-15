@@ -2,7 +2,7 @@
  * Recommended Item Modal Component
  *
  * Displays detailed information about a recommended item (product, amenity, or menu item)
- * 
+ *
  * Refactored to use:
  * - ModalHeader: Reusable modal header with close button
  * - ModalItemImage: Image display with badges
@@ -10,7 +10,7 @@
  * - TourDetails: Tour-specific information
  * - ContactInfo: Contact information display
  * - ModalActionButtons: Action buttons based on item type
- * 
+ *
  * Features:
  * - Full-screen mobile-optimized modal
  * - Image display
@@ -63,13 +63,34 @@ export const RecommendedItemModal = ({
     };
   }, [isOpen]);
 
-  if (!isOpen || !item) {
+  if (!isOpen) {
     return null;
   }
 
+  // If no item is provided, we need at least restaurant or tour data
+  if (!item && !restaurant && !tour) {
+    return null;
+  }
+
+  // Create a fallback item if not provided
+  const displayItem = item || {
+    id: tour?.id || restaurant?.place_id || "",
+    type: tour ? ("amenity" as const) : ("product" as const),
+    title: tour?.name || restaurant?.name || "",
+    description: tour?.shortDescription || "",
+    price: tour?.price?.amount || 0,
+    imageUrl:
+      tour?.pictures?.[0] || restaurant?.photos?.[0]?.photo_reference
+        ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${
+            restaurant?.photos?.[0]?.photo_reference
+          }&key=${import.meta.env.VITE_GOOGLE_PLACES_API_KEY}`
+        : undefined,
+    category: tour?.category || restaurant?.types?.[0] || "General",
+  };
+
   // Get category styling
   const getCategoryStyle = () => {
-    switch (item.type) {
+    switch (displayItem.type) {
       case "product":
         return "bg-blue-100 text-blue-800";
       case "amenity":
@@ -96,31 +117,33 @@ export const RecommendedItemModal = ({
       {/* Modal Container - Slides up on mobile */}
       <div className="bg-white w-full sm:max-w-lg sm:rounded-lg max-h-[85vh] overflow-y-auto rounded-t-2xl sm:rounded-b-lg animate-in slide-in-from-bottom duration-300 sm:animate-in sm:fade-in">
         {/* Header */}
-        <ModalHeader title={item.title} onClose={onClose} />
+        <ModalHeader title={displayItem.title} onClose={onClose} />
 
         {/* Modal Content */}
         <div className="p-3">
           {/* Image Section */}
           <ModalItemImage
-            imageUrl={item.imageUrl}
-            title={item.title}
-            category={item.category || "Item"}
-            price={item.price}
+            imageUrl={displayItem.imageUrl}
+            title={displayItem.title}
+            category={displayItem.category || "Item"}
+            price={displayItem.price}
             getCategoryStyle={getCategoryStyle}
           />
 
           {/* Title */}
-          <h3 className="text-lg font-bold text-gray-900 mb-2">{item.title}</h3>
+          <h3 className="text-lg font-bold text-gray-900 mb-2">
+            {displayItem.title}
+          </h3>
 
           {/* Description */}
-          {item.description ? (
+          {displayItem.description ? (
             <div className="mb-4">
               <h4 className="text-sm font-semibold text-gray-900 mb-1">
                 Description
               </h4>
               <div
                 className="text-sm text-gray-700 leading-relaxed prose prose-sm max-w-none"
-                dangerouslySetInnerHTML={{ __html: item.description }}
+                dangerouslySetInnerHTML={{ __html: displayItem.description }}
               />
             </div>
           ) : (
@@ -139,7 +162,7 @@ export const RecommendedItemModal = ({
 
           {/* Action Buttons */}
           <ModalActionButtons
-            itemType={item.type}
+            itemType={displayItem.type}
             hideActionButtons={hideActionButtons}
             onClose={onClose}
           />

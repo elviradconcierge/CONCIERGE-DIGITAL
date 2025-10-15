@@ -28,7 +28,13 @@ export const useFilterState = ({
   // Calculate max price from items
   const maxPrice = useMemo(() => {
     if (items.length === 0) return initialMaxPrice;
-    return Math.ceil(Math.max(...items.map((item) => item.price)));
+
+    // Filter out items with price 0 (no price info) before calculating max
+    const itemsWithPrice = items.filter((item) => item.price > 0);
+
+    if (itemsWithPrice.length === 0) return initialMaxPrice;
+
+    return Math.ceil(Math.max(...itemsWithPrice.map((item) => item.price)));
   }, [items, initialMaxPrice]);
 
   // Update price range when maxPrice changes
