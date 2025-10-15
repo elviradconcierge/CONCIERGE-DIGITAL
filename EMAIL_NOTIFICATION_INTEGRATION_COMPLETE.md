@@ -1,11 +1,13 @@
 # Email Notification Integration - Complete ✅
 
 ## Overview
+
 Successfully integrated email notifications into all three cart systems (Shop, DineIn, Services) using the `send-order-notification-email` edge function.
 
 ## Implementation Summary
 
 ### 1. Email Service Utility
+
 **File:** `src/services/orderEmailNotification.service.ts`
 
 - **Purpose:** Wrapper service for invoking the email edge function
@@ -14,6 +16,7 @@ Successfully integrated email notifications into all three cart systems (Shop, D
 - **Error Handling:** Returns `{ success: boolean; error?: string }`
 
 #### OrderEmailData Interface
+
 ```typescript
 interface OrderEmailData {
   guestName: string;
@@ -29,7 +32,7 @@ interface OrderEmailData {
     shopTotalPrice?: number;
     shopDeliveryDate?: string;
     shopDeliveryTime?: string;
-    
+
     // DineIn fields
     restaurantName?: string;
     orderItems?: Array<{ name: string; quantity: number; price: number }>;
@@ -40,7 +43,7 @@ interface OrderEmailData {
     reservationTime?: string;
     numberOfGuests?: number;
     tablePreferences?: string;
-    
+
     // Amenity fields
     amenityName?: string;
     amenityCategory?: string;
@@ -53,9 +56,11 @@ interface OrderEmailData {
 ```
 
 ### 2. Shop Cart Integration
+
 **File:** `src/pages/Guests/components/ShopCart/ShopCartBottomSheet.tsx`
 
 **Changes:**
+
 - Imported `sendOrderNotificationEmail` service
 - Captured order result to get `orderId`
 - Extracted guest email from `guest_personal_data`
@@ -63,6 +68,7 @@ interface OrderEmailData {
 - Error handling: Logs email failures but doesn't block order success
 
 **Email Data Sent:**
+
 ```typescript
 {
   orderType: "shop",
@@ -83,9 +89,11 @@ interface OrderEmailData {
 ```
 
 ### 3. DineIn Cart Integration
+
 **File:** `src/pages/Guests/components/DineInCart/DineInCartBottomSheet.tsx`
 
 **Changes:**
+
 - Imported `sendOrderNotificationEmail` service
 - Captured order result to get `orderId`
 - Extracted guest email from `guest_personal_data`
@@ -95,6 +103,7 @@ interface OrderEmailData {
 - Error handling: Logs email failures but doesn't block order success
 
 **Email Data Sent:**
+
 ```typescript
 {
   orderType: "dine_in",
@@ -109,13 +118,13 @@ interface OrderEmailData {
     orderItems: [{ name, quantity, price }],
     totalPrice: totalPrice,
     specialInstructions: specialInstructions,
-    
+
     // Restaurant booking specific
     reservationDate: reservationDate,
     reservationTime: reservationTime,
     numberOfGuests: numberOfGuests,
     tablePreferences: tablePreferences,
-    
+
     // Room service specific
     deliveryDate: deliveryDate,
     deliveryTime: deliveryTime
@@ -124,9 +133,11 @@ interface OrderEmailData {
 ```
 
 ### 4. Services Cart Integration
+
 **File:** `src/pages/Guests/components/ServicesCart/ServicesCartBottomSheet.tsx`
 
 **Changes:**
+
 - Imported `sendOrderNotificationEmail` service
 - Extracted guest email from `guest_personal_data`
 - Sent **multiple emails** (one per amenity) using `Promise.all()`
@@ -134,6 +145,7 @@ interface OrderEmailData {
 - Error handling: Logs email failures but doesn't block request success
 
 **Email Data Sent (per amenity):**
+
 ```typescript
 {
   orderType: "amenity",
@@ -157,6 +169,7 @@ interface OrderEmailData {
 ## Key Features
 
 ### Guest Email Extraction
+
 All three implementations use the same pattern to safely extract guest email:
 
 ```typescript
@@ -169,6 +182,7 @@ const guestEmail = Array.isArray(guestPersonalData)
 This handles both array and single object formats of `guest_personal_data`.
 
 ### Error Handling Strategy
+
 ```typescript
 try {
   await sendOrderNotificationEmail(emailData);
@@ -184,6 +198,7 @@ try {
 - Staff can see failed email attempts in console logs
 
 ### Data Flow
+
 1. Guest completes checkout in cart
 2. Order/request is created in database
 3. Order ID is captured from mutation result
@@ -196,9 +211,11 @@ try {
 ## Edge Function Integration
 
 ### Edge Function: `send-order-notification-email`
+
 **Location:** Supabase Edge Functions
 
 **Features:**
+
 - Uses Resend API for email delivery
 - Supports 3 order types: `shop`, `dine_in`, `amenity`
 - Generates HTML and text email templates
@@ -206,6 +223,7 @@ try {
 - Returns success/error status
 
 **Email Templates:**
+
 - **Shop Orders:** Product list, quantities, total price, delivery date/time
 - **DineIn Orders:** Menu items, reservation/delivery details, restaurant info
 - **Amenity Requests:** Amenity name, category, price, request date/time
@@ -213,6 +231,7 @@ try {
 ## Testing Checklist
 
 ### Shop Cart
+
 - [ ] Guest receives email after shop order
 - [ ] Email includes all ordered products
 - [ ] Email shows correct delivery date/time
@@ -222,6 +241,7 @@ try {
 - [ ] Special instructions included (if provided)
 
 ### DineIn Cart
+
 - [ ] Guest receives email after restaurant booking
 - [ ] Guest receives email after room service order
 - [ ] Email includes all ordered menu items
@@ -233,6 +253,7 @@ try {
 - [ ] Email shows total price
 
 ### Services Cart
+
 - [ ] Guest receives separate emails for each amenity
 - [ ] Each email includes amenity name and price
 - [ ] Email shows request date/time
@@ -241,6 +262,7 @@ try {
 - [ ] Special instructions included (if provided)
 
 ### Error Scenarios
+
 - [ ] Order succeeds even if email fails
 - [ ] Email failure is logged to console
 - [ ] Success modal still shows for failed email
@@ -249,12 +271,14 @@ try {
 ## Environment Requirements
 
 ### Supabase Setup
+
 1. **Edge Function Deployed:** `send-order-notification-email` must be deployed
 2. **Resend API Key:** Must be configured in edge function environment
 3. **Supabase URL:** Must be accessible from frontend
 4. **Supabase Anon Key:** Must be configured in frontend
 
 ### Guest Session Requirements
+
 1. **Guest Authentication:** Guest must be logged in
 2. **Guest Email:** Must be provided in `guest_personal_data`
 3. **Hotel Data:** Hotel name must be in session
@@ -263,15 +287,18 @@ try {
 ## Known Limitations
 
 ### Amenity Requests
+
 - Order ID is set to "N/A" because bulk creation doesn't return individual IDs
 - Each amenity sends a separate email (could be batched in future)
 
 ### Email Validation
+
 - No validation that guest email is valid before sending
 - Failed emails don't retry automatically
 - No email queue system (sends immediately)
 
 ### Rate Limiting
+
 - No built-in rate limiting for email sends
 - Multiple amenities in cart = multiple emails sent simultaneously
 - Consider implementing email batching for >5 amenities
@@ -279,6 +306,7 @@ try {
 ## Future Enhancements
 
 ### Potential Improvements
+
 1. **Email Batching:** Combine multiple amenities into single email
 2. **Email Queue:** Implement retry logic for failed emails
 3. **Email Templates:** Store templates in database for easy editing
@@ -297,6 +325,6 @@ Email notification integration is **complete and functional** across all three c
 ✅ Proper guest data extraction  
 ✅ Edge function integration  
 ✅ Type-safe TypeScript implementation  
-✅ Comprehensive order details in emails  
+✅ Comprehensive order details in emails
 
 The system is ready for testing and production deployment. Monitor console logs for email failures and consider implementing the suggested enhancements based on usage patterns.

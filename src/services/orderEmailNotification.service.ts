@@ -6,7 +6,7 @@
 
 import { supabase } from "../lib/supabase";
 
-interface OrderEmailData {
+export interface OrderEmailData {
   guestName: string;
   guestEmail: string;
   roomNumber: string;

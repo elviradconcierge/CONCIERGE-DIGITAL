@@ -15,7 +15,7 @@ import { useProductCategories } from "../../../../hooks/queries/hotel-management
 import type { RecommendedItem } from "../../../../hooks/queries";
 import { MenuItemCard } from "../../components/MenuItemCard";
 import { useCart } from "../../../../contexts/CartContext";
-import { ShopCartBottomSheet } from "../../components/ShopCart";
+import { ShopCartBottomSheet } from "../../components/cart";
 
 export const ShopPage = () => {
   const hotelId = useGuestHotelId();

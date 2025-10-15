@@ -124,9 +124,11 @@ export const AddToCartButton = ({
     lg: "min-w-[90px]",
   };
 
-  // For service items, show simple "Added" or "Add" button
+  // For service items, show simple circular "+" button (same as food/product when quantity is 0)
+  // Services don't have quantity controls, just add/remove
   if (itemType === "service") {
     const isAdded = quantity > 0;
+
     return (
       <button
         onClick={isAdded ? () => removeItem(itemId) : handleAdd}
@@ -142,11 +144,11 @@ export const AddToCartButton = ({
           }
           ${isAdded ? "text-white" : "text-[#8B5CF6] hover:text-white"}
           rounded-full
-          font-semibold text-xs
+          font-semibold
           transition-all duration-200
           shadow-lg hover:shadow-xl
           transform ${disabled ? "" : "hover:scale-110 active:scale-95"}
-          flex items-center justify-center gap-1
+          flex items-center justify-center
           border ${
             isAdded
               ? "border-green-600"
@@ -154,7 +156,21 @@ export const AddToCartButton = ({
           }
         `}
       >
-        {isAdded ? "Added ✓" : "Add"}
+        {isAdded ? (
+          <svg
+            className={iconSizeClasses[size]}
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path
+              fillRule="evenodd"
+              d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+              clipRule="evenodd"
+            />
+          </svg>
+        ) : (
+          <Plus className={iconSizeClasses[size]} strokeWidth={2.5} />
+        )}
       </button>
     );
   }

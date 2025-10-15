@@ -16,7 +16,7 @@ import {
 import type { RecommendedItem } from "../../../../hooks/queries";
 import type { FilterOptions } from "../../components/common";
 import { useCart } from "../../../../contexts/CartContext";
-import { DineInCartBottomSheet } from "../../components/DineInCart/DineInCartBottomSheet";
+import { DineInCartBottomSheet } from "../../components/cart";
 
 export const DineInPage = () => {
   const hotelId = useGuestHotelId();

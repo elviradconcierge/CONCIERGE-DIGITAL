@@ -7,7 +7,7 @@
 
 import { useMemo, useState } from "react";
 import { FilterableListPage } from "../../components/FilterableListPage";
-import { ServicesCartBottomSheet } from "../../components/ServicesCart/ServicesCartBottomSheet";
+import { ServicesCartBottomSheet } from "../../components/cart";
 import { useCart } from "../../../../contexts/CartContext";
 import { useGuestHotelId } from "../../hooks";
 import {
