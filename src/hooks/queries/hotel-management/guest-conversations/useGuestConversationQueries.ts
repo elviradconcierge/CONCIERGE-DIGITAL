@@ -71,6 +71,7 @@ export const useConversationById = (conversationId: string | undefined) => {
 /**
  * Get conversation by guest ID
  * Useful for finding existing conversation for a guest
+ * Returns null if no conversation exists yet
  */
 export const useConversationByGuest = (
   guestId: string | undefined,
@@ -88,10 +89,10 @@ export const useConversationByGuest = (
         .select(CONVERSATION_WITH_GUEST_SELECT)
         .eq("guest_id", guestId)
         .eq("hotel_id", hotelId)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
-      return data as ConversationWithGuest;
+      return data as ConversationWithGuest | null;
     },
     enabled: !!guestId,
   });

@@ -28,14 +28,13 @@ export const useConversationSetup = ({
     useCreateConversation();
 
   const createConversationWithStaff = async (): Promise<string | null> => {
-    // Find available staff member
+    // Try to find available staff member (optional - for routing only)
     const assignedStaffId = await findAvailableStaff(hotelId);
 
     if (!assignedStaffId) {
-      console.error(
-        "❌ [useConversationSetup] Cannot create conversation: No staff available"
+      console.log(
+        "ℹ️ [useConversationSetup] No staff member available for assignment - creating conversation anyway (conversation is with hotel, not staff)"
       );
-      return null;
     }
 
     return new Promise((resolve, reject) => {
@@ -43,12 +42,19 @@ export const useConversationSetup = ({
         {
           guest_id: guestId,
           hotel_id: hotelId,
-          assigned_staff_id: assignedStaffId,
+          assigned_staff_id: assignedStaffId || null, // Optional - only for routing
           status: "active",
           last_message_at: new Date().toISOString(),
         },
         {
           onSuccess: (newConversation: GuestConversation) => {
+            console.log(
+              "✅ [useConversationSetup] Conversation created successfully:",
+              newConversation.id,
+              assignedStaffId
+                ? `(assigned to staff: ${assignedStaffId})`
+                : "(no staff assigned yet)"
+            );
             onConversationCreated?.(newConversation.id);
             resolve(newConversation.id);
           },

@@ -31,6 +31,7 @@ import {
   useMessageSubscription,
   useConversationSetup,
   useMessageHandling,
+  useMessageAnalysis,
 } from "./hooks";
 
 interface UseGuestChatProps {
@@ -77,6 +78,13 @@ export const useGuestChat = ({
     hotelId,
   });
 
+  // Setup AI analysis and translation
+  const { analyzeMessage } = useMessageAnalysis({
+    guestId,
+    hotelId,
+    enabled: true,
+  });
+
   // Handle message transformations and read status
   const { messages, unreadCount } = useMessageHandling({
     messagesData,
@@ -94,6 +102,7 @@ export const useGuestChat = ({
   /**
    * Send a new message
    * Creates conversation if it doesn't exist (with assigned staff)
+   * Automatically triggers AI analysis after sending
    */
   const sendMessage = async (content: string) => {
     // If no conversation exists, create one first
@@ -108,22 +117,56 @@ export const useGuestChat = ({
       }
 
       // Now send the message with the new conversation ID
-      sendMessageMutation({
-        conversation_id: newConversationId,
-        message_text: content,
-        sender_type: "guest",
-        guest_id: guestId,
-        is_read: false,
-      });
+      sendMessageMutation(
+        {
+          conversation_id: newConversationId,
+          hotel_id: hotelId, // ✅ Include hotel_id
+          message_text: content,
+          sender_type: "guest",
+          guest_id: guestId,
+          is_read: false,
+        },
+        {
+          onSuccess: (data) => {
+            // Trigger AI analysis after message is saved
+            console.log(
+              "✅ [useGuestChat] Message sent, triggering AI analysis"
+            );
+            analyzeMessage(data.id, content).catch((error) => {
+              console.error(
+                "⚠️ [useGuestChat] AI analysis failed (non-blocking):",
+                error
+              );
+            });
+          },
+        }
+      );
     } else {
       // Conversation exists, just send the message
-      sendMessageMutation({
-        conversation_id: conversationId,
-        message_text: content,
-        sender_type: "guest",
-        guest_id: guestId,
-        is_read: false,
-      });
+      sendMessageMutation(
+        {
+          conversation_id: conversationId,
+          hotel_id: hotelId, // ✅ Include hotel_id
+          message_text: content,
+          sender_type: "guest",
+          guest_id: guestId,
+          is_read: false,
+        },
+        {
+          onSuccess: (data) => {
+            // Trigger AI analysis after message is saved
+            console.log(
+              "✅ [useGuestChat] Message sent, triggering AI analysis"
+            );
+            analyzeMessage(data.id, content).catch((error) => {
+              console.error(
+                "⚠️ [useGuestChat] AI analysis failed (non-blocking):",
+                error
+              );
+            });
+          },
+        }
+      );
     }
   };
 

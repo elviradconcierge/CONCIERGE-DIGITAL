@@ -30,7 +30,9 @@ export const conversationKeys = {
 // ============================================================================
 
 /**
- * Select pattern for conversations with full guest and staff details
+ * Select pattern for conversations with full guest details
+ * Note: Conversation is between guest and hotel
+ * assigned_staff_id references profiles table (for staff user accounts)
  */
 export const CONVERSATION_WITH_GUEST_SELECT = `
   *,
@@ -43,17 +45,6 @@ export const CONVERSATION_WITH_GUEST_SELECT = `
       last_name,
       guest_email,
       phone_number
-    )
-  ),
-  assigned_staff_data:hotel_staff_personal_data!hotel_staff_personal_data_staff_id_fkey(
-    staff_id,
-    first_name,
-    last_name,
-    hotel_staff!hotel_staff_id_fkey(
-      id,
-      employee_id,
-      position,
-      hotel_id
     )
   )
 `;

@@ -30,14 +30,12 @@ export const getGuestFullName = (
 
 /**
  * Get the full name of the assigned staff
+ * Note: Staff data is not fetched in the query for simplicity
  */
 export const getAssignedStaffName = (
-  conversation: ConversationWithGuest
+  _conversation: ConversationWithGuest
 ): string | null => {
-  const staffData = conversation.assigned_staff_data;
-  if (staffData?.first_name && staffData?.last_name) {
-    return `${staffData.first_name} ${staffData.last_name}`;
-  }
+  // Staff details would need to be fetched separately if needed
   return null;
 };
 

@@ -20,11 +20,11 @@ export type GuestMessageUpdate = Update<"guest_messages">;
 // ============================================================================
 
 /**
- * Database Relationship Chain for Assigned Staff:
- * guest_conversation.assigned_staff_id → hotel_staff_personal_data.staff_id → hotel_staff.id
+ * Conversation with guest details
  *
- * This means assigned_staff_id references staff_id in hotel_staff_personal_data table,
- * which then references id in hotel_staff table.
+ * Note: The conversation is between the guest and the hotel.
+ * assigned_staff_id is stored but references profiles table for staff user accounts.
+ * For simplicity, we don't fetch staff details in the initial query.
  */
 export type ConversationWithGuest = GuestConversation & {
   guests?: {
@@ -37,17 +37,6 @@ export type ConversationWithGuest = GuestConversation & {
       guest_email: string;
       phone_number: string;
     }[];
-  };
-  assigned_staff_data?: {
-    staff_id: string;
-    first_name: string;
-    last_name: string;
-    hotel_staff?: {
-      id: string;
-      employee_id: string;
-      position: string;
-      hotel_id: string;
-    };
   };
   unread_count?: number;
   last_message?: GuestMessage;
