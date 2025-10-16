@@ -20,6 +20,8 @@ interface StaffDataViewProps {
   handleRowClick: (staff: StaffMember) => void;
   onEdit?: (staff: StaffMember) => void;
   onDelete?: (staff: StaffMember) => void;
+  currentUserId?: string; // Current logged-in user's staff ID
+  isAdminOrManager?: boolean; // Whether current user is admin/manager
 }
 
 /**
@@ -30,8 +32,31 @@ const StaffCard: React.FC<{
   onClick: () => void;
   onEdit?: (staff: StaffMember) => void;
   onDelete?: (staff: StaffMember) => void;
-}> = ({ staff, onClick, onEdit, onDelete }) => {
+  currentUserId?: string;
+  isAdminOrManager?: boolean;
+}> = ({
+  staff,
+  onClick,
+  onEdit,
+  onDelete,
+  currentUserId,
+  isAdminOrManager,
+}) => {
   const status = String(staff.status || "");
+
+  // Determine which actions to show
+  // Admin/Manager: can edit and delete anyone
+  // Hotel Staff: can only edit their own profile, no delete
+  const canEdit = isAdminOrManager || staff.id === currentUserId;
+  const canDelete = isAdminOrManager;
+
+  console.log(`🎴 [StaffCard] ${staff.name}:`, {
+    staffId: staff.id,
+    currentUserId,
+    isAdminOrManager,
+    canEdit,
+    canDelete,
+  });
 
   return (
     <GenericCard
@@ -62,8 +87,8 @@ const StaffCard: React.FC<{
       ]}
       footer={
         <CardActionFooter
-          onEdit={onEdit ? () => onEdit(staff) : undefined}
-          onDelete={onDelete ? () => onDelete(staff) : undefined}
+          onEdit={canEdit && onEdit ? () => onEdit(staff) : undefined}
+          onDelete={canDelete && onDelete ? () => onDelete(staff) : undefined}
         />
       }
       onClick={onClick}
@@ -80,7 +105,15 @@ export const StaffDataView: React.FC<StaffDataViewProps> = ({
   handleRowClick,
   onEdit,
   onDelete,
+  currentUserId,
+  isAdminOrManager = false,
 }) => {
+  console.log("📊 [StaffDataView] Rendering with:", {
+    currentUserId,
+    isAdminOrManager,
+    itemCount: filteredData.length,
+  });
+
   return (
     <GenericDataView<StaffMember>
       viewMode={viewMode}
@@ -94,6 +127,8 @@ export const StaffDataView: React.FC<StaffDataViewProps> = ({
           onClick={onClick}
           onEdit={onEdit}
           onDelete={onDelete}
+          currentUserId={currentUserId}
+          isAdminOrManager={isAdminOrManager}
         />
       )}
       onItemClick={handleRowClick}

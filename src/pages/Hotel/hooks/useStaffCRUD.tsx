@@ -90,16 +90,32 @@ export const useStaffCRUD = ({
         });
       },
       update: async (id, data) => {
+        console.log("🔄 [useStaffCRUD] Update initiated for staff ID:", id);
+        console.log("📝 [useStaffCRUD] Form data received:", data);
+
         // Split name into first_name and last_name
         const fullName = (data.name as string) || "";
         const nameParts = fullName.trim().split(" ");
         const firstName = nameParts[0] || "";
         const lastName = nameParts.slice(1).join(" ") || "";
 
-        const staffUpdates = {
-          position: data.position as string,
-          department: data.department as string,
-        };
+        // Only include staffUpdates if position and department are present in data
+        // (This handles the case where Hotel Staff only edits personal data)
+        let staffUpdates = undefined;
+        if (data.position && data.department) {
+          staffUpdates = {
+            position: data.position as string,
+            department: data.department as string,
+          };
+          console.log(
+            "✅ [useStaffCRUD] Staff updates included:",
+            staffUpdates
+          );
+        } else {
+          console.log(
+            "⚠️ [useStaffCRUD] Staff updates skipped (position/department not in form)"
+          );
+        }
 
         const personalDataUpdates = {
           first_name: firstName,
@@ -116,11 +132,22 @@ export const useStaffCRUD = ({
             (data.emergencyContactNumber as string) || undefined,
         };
 
-        await updateStaffMutation.mutateAsync({
-          staffId: id as string,
-          staffUpdates,
-          personalDataUpdates,
-        });
+        console.log(
+          "📋 [useStaffCRUD] Personal data updates:",
+          personalDataUpdates
+        );
+
+        try {
+          await updateStaffMutation.mutateAsync({
+            staffId: id as string,
+            staffUpdates,
+            personalDataUpdates,
+          });
+          console.log("✅ [useStaffCRUD] Staff update successful");
+        } catch (error) {
+          console.error("❌ [useStaffCRUD] Staff update failed:", error);
+          throw error;
+        }
       },
       delete: async (id) => {
         await deleteStaffMutation.mutateAsync(id as string);

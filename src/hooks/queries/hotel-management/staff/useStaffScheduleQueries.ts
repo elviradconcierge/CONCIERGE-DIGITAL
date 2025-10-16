@@ -79,6 +79,12 @@ export const useStaffSchedules = (hotelId?: string) => {
   return useQuery({
     queryKey: staffScheduleKeys.list(hotelId),
     queryFn: async () => {
+      console.log("====================================");
+      console.log("🔍 [useStaffSchedules] QUERY STARTING");
+      console.log("====================================");
+      console.log("Hotel ID:", hotelId);
+      console.log("Query enabled:", !!hotelId);
+
       let query = supabase
         .from("staff_schedules")
         .select("*")
@@ -88,9 +94,21 @@ export const useStaffSchedules = (hotelId?: string) => {
         query = query.eq("hotel_id", hotelId);
       }
 
+      console.log("📤 [useStaffSchedules] Executing Supabase query...");
       const { data, error } = await query;
 
-      if (error) throw error;
+      console.log("====================================");
+      console.log("📊 [useStaffSchedules] QUERY RESULT");
+      console.log("====================================");
+      console.log("Error:", error);
+      console.log("Data count:", data?.length || 0);
+      console.log("Data:", data);
+      console.log("====================================");
+
+      if (error) {
+        console.error("❌ [useStaffSchedules] Query error:", error);
+        throw error;
+      }
       return (data as StaffSchedule[]) || [];
     },
     enabled: !!hotelId,

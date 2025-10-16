@@ -3,6 +3,7 @@ export { StaffDetail } from "./staff-managment/StaffDetail";
 export { TaskDetail } from "./task-managment/TaskDetail";
 export { AbsenceRequestDetail } from "./absence/AbsenceRequestDetail";
 export { StaffForm } from "./staff-managment/StaffForm";
+export { TaskForm } from "./task-managment/TaskForm";
 export { STAFF_FORM_FIELDS } from "./staff-managment/StaffFormFields";
 export {
   TASK_FORM_FIELDS,

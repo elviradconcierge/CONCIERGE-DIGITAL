@@ -49,7 +49,10 @@ interface CRUDModalContainerProps<T> {
     formState: CRUDFormState;
     formActions: CRUDFormActions;
     disabled?: boolean;
+    isEditMode?: boolean;
+    [key: string]: unknown; // Allow additional props
   }>;
+  customFormProps?: Record<string, unknown>; // Additional props to pass to custom form
 }
 
 export const CRUDModalContainer = <T extends { id: string | number }>({
@@ -72,6 +75,7 @@ export const CRUDModalContainer = <T extends { id: string | number }>({
   renderDetailContent,
   detailModalActions = { showEdit: true, showDelete: true },
   customFormComponent: CustomFormComponent,
+  customFormProps = {},
 }: CRUDModalContainerProps<T>): React.ReactElement => {
   // Use custom form component or default to DynamicForm
   const FormComponent = CustomFormComponent || DynamicForm;
@@ -83,7 +87,7 @@ export const CRUDModalContainer = <T extends { id: string | number }>({
         await onCreateSubmit();
         modalActions.closeAllModals();
         formActions.resetForm();
-      } catch (error) {
+      } catch {
         formActions.setError(
           "general",
           `Failed to create ${entityName.toLowerCase()}`
@@ -102,7 +106,7 @@ export const CRUDModalContainer = <T extends { id: string | number }>({
         await onEditSubmit();
         modalActions.closeAllModals();
         formActions.resetForm();
-      } catch (error) {
+      } catch {
         formActions.setError(
           "general",
           `Failed to update ${entityName.toLowerCase()}`
@@ -118,7 +122,7 @@ export const CRUDModalContainer = <T extends { id: string | number }>({
     try {
       await onDeleteConfirm();
       modalActions.closeAllModals();
-    } catch (error) {
+    } catch {
       // Error handling
     } finally {
       modalActions.setSubmitting(false);
@@ -140,6 +144,8 @@ export const CRUDModalContainer = <T extends { id: string | number }>({
           fields={formFields}
           formState={formState}
           formActions={formActions}
+          isEditMode={false}
+          {...customFormProps}
         />
       </FormModal>
 
@@ -159,6 +165,8 @@ export const CRUDModalContainer = <T extends { id: string | number }>({
           fields={formFields}
           formState={formState}
           formActions={formActions}
+          isEditMode={true}
+          {...customFormProps}
         />
       </FormModal>
 

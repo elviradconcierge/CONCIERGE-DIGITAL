@@ -13,6 +13,7 @@ import {
   TaskDetail,
   AbsenceRequestDetail,
   StaffForm,
+  TaskForm,
   STAFF_FORM_FIELDS,
   getTaskFormFields,
   getAbsenceRequestFormFields,
@@ -121,18 +122,42 @@ export const HotelStaffPage = () => {
       // Only show add button for admin/manager
       addButtonLabel={isAdminOrManager ? "Add Staff Member" : ""}
       addButtonIcon={isAdminOrManager ? Plus : undefined}
-      onAddClick={
-        isAdminOrManager
-          ? () => staffCRUD.modalActions.openCreateModal()
-          : () => {}
-      }
+      onAddClick={() => {
+        if (isAdminOrManager) {
+          staffCRUD.modalActions.openCreateModal();
+        }
+      }}
       DataViewComponent={StaffDataView}
+      dataViewProps={{
+        currentUserId: hotelStaff.hotelStaff?.id,
+        isAdminOrManager: isAdminOrManager,
+      }}
       // Regular staff can only view details
       onRowClick={(staff) => staffCRUD.modalActions.openDetailModal(staff)}
       onEdit={
+        // Admin/Manager can edit anyone, Hotel Staff can edit only their own profile
         isAdminOrManager
-          ? (staff) => staffCRUD.modalActions.openEditModal(staff)
-          : () => {}
+          ? (staff) => {
+              console.log(
+                "👤 [HotelStaffPage] Admin/Manager editing staff:",
+                staff.id
+              );
+              staffCRUD.modalActions.openEditModal(staff);
+            }
+          : (staff) => {
+              // Allow Hotel Staff to edit only their own profile
+              if (staff.id === hotelStaff.hotelStaff?.id) {
+                console.log(
+                  "👤 [HotelStaffPage] Hotel Staff editing own profile:",
+                  staff.id
+                );
+                staffCRUD.modalActions.openEditModal(staff);
+              } else {
+                console.log(
+                  "🚫 [HotelStaffPage] Hotel Staff cannot edit other profiles"
+                );
+              }
+            }
       }
       onDelete={
         isAdminOrManager
@@ -148,14 +173,34 @@ export const HotelStaffPage = () => {
         isAdminOrManager ? staffCRUD.handleCreateSubmit : async () => {}
       }
       onEditSubmit={
-        isAdminOrManager ? staffCRUD.handleEditSubmit : async () => {}
+        // Both Admin/Manager and Hotel Staff can submit edits
+        // The form will handle field restrictions
+        async () => {
+          console.log("💾 [HotelStaffPage] Edit submit triggered");
+          console.log(
+            "👤 [HotelStaffPage] Current user:",
+            hotelStaff.hotelStaff?.position
+          );
+          await staffCRUD.handleEditSubmit();
+        }
       }
       onDeleteConfirm={
         isAdminOrManager ? staffCRUD.handleDeleteConfirm : () => {}
       }
       entityName="Staff Member"
       renderDetailContent={(item) => <StaffDetail item={item} />}
+      detailModalActions={{
+        // Admin/Manager can always edit and delete
+        // Hotel Staff can only edit their own profile (delete not allowed)
+        showEdit:
+          isAdminOrManager ||
+          staffCRUD.modalState.itemToView?.id === hotelStaff.hotelStaff?.id,
+        showDelete: isAdminOrManager,
+      }}
       customFormComponent={StaffForm}
+      customFormProps={{
+        currentUserPosition: hotelStaff.hotelStaff?.position,
+      }}
     />
   );
 
@@ -185,17 +230,37 @@ export const HotelStaffPage = () => {
       }
       addButtonLabel={isAdminOrManager ? "Add Task" : ""}
       addButtonIcon={isAdminOrManager ? Plus : undefined}
-      onAddClick={
-        isAdminOrManager
-          ? () => tasksCRUD.modalActions.openCreateModal()
-          : undefined
-      }
+      onAddClick={() => {
+        if (isAdminOrManager) {
+          tasksCRUD.modalActions.openCreateModal();
+        }
+      }}
       DataViewComponent={TasksDataView}
       onRowClick={(task) => tasksCRUD.modalActions.openDetailModal(task)}
       onEdit={
+        // Admin/Manager can edit any task, Hotel Staff can edit their assigned tasks
         isAdminOrManager
-          ? (task) => tasksCRUD.modalActions.openEditModal(task)
-          : undefined
+          ? (task) => {
+              console.log(
+                "👤 [HotelStaffPage] Admin/Manager editing task:",
+                task.id
+              );
+              tasksCRUD.modalActions.openEditModal(task);
+            }
+          : (task) => {
+              // Allow Hotel Staff to edit only their assigned tasks
+              if (task.staffId === hotelStaff.hotelStaff?.id) {
+                console.log(
+                  "👤 [HotelStaffPage] Hotel Staff editing assigned task:",
+                  task.id
+                );
+                tasksCRUD.modalActions.openEditModal(task);
+              } else {
+                console.log(
+                  "🚫 [HotelStaffPage] Hotel Staff cannot edit unassigned tasks"
+                );
+              }
+            }
       }
       onDelete={
         isAdminOrManager
@@ -210,12 +275,37 @@ export const HotelStaffPage = () => {
       onCreateSubmit={
         isAdminOrManager ? tasksCRUD.handleCreateSubmit : undefined
       }
-      onEditSubmit={isAdminOrManager ? tasksCRUD.handleEditSubmit : undefined}
+      onEditSubmit={
+        // Both Admin/Manager and Hotel Staff can submit edits
+        // The form will handle field restrictions
+        async () => {
+          console.log("💾 [HotelStaffPage] Task edit submit triggered");
+          console.log(
+            "👤 [HotelStaffPage] Current user:",
+            hotelStaff.hotelStaff?.position
+          );
+          await tasksCRUD.handleEditSubmit();
+        }
+      }
       onDeleteConfirm={
         isAdminOrManager ? tasksCRUD.handleDeleteConfirm : undefined
       }
       entityName="Task"
       renderDetailContent={(item) => <TaskDetail item={item} />}
+      detailModalActions={{
+        // Admin/Manager can always edit and delete
+        // Hotel Staff can only edit their assigned tasks (delete not allowed)
+        showEdit:
+          isAdminOrManager ||
+          tasksCRUD.modalState.itemToView?.staffId ===
+            hotelStaff.hotelStaff?.id,
+        showDelete: isAdminOrManager,
+      }}
+      customFormComponent={TaskForm}
+      customFormProps={{
+        currentUserPosition: hotelStaff.hotelStaff?.position,
+        taskFormFields: taskFormFields,
+      }}
     />
   );
 

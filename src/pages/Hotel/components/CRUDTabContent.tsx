@@ -49,10 +49,12 @@ interface CRUDTabContentProps<T> {
     handleRowClick: (item: T) => void;
     onEdit?: (item: T) => void;
     onDelete?: (item: T) => void;
+    [key: string]: unknown; // Allow additional props
   }>;
   onRowClick: (item: T) => void;
   onEdit?: (item: T) => void;
   onDelete?: (item: T) => void;
+  dataViewProps?: Record<string, unknown>; // Additional props for DataView
 
   // CRUD Modal
   modalState: CRUDModalState<T>;
@@ -65,11 +67,18 @@ interface CRUDTabContentProps<T> {
   onDeleteConfirm: () => void;
   entityName: string;
   renderDetailContent?: (item: T) => React.ReactNode;
+  detailModalActions?: {
+    showEdit?: boolean;
+    showDelete?: boolean;
+  };
   customFormComponent?: React.ComponentType<{
     formState: CRUDFormState;
     formActions: CRUDFormActions;
     disabled?: boolean;
+    isEditMode?: boolean;
+    [key: string]: unknown; // Allow additional props
   }>;
+  customFormProps?: Record<string, unknown>; // Additional props for custom form
 }
 
 export const CRUDTabContent = <T extends { id: string | number }>({
@@ -90,6 +99,7 @@ export const CRUDTabContent = <T extends { id: string | number }>({
   onRowClick,
   onEdit,
   onDelete,
+  dataViewProps = {},
   modalState,
   modalActions,
   formState,
@@ -100,7 +110,9 @@ export const CRUDTabContent = <T extends { id: string | number }>({
   onDeleteConfirm,
   entityName,
   renderDetailContent,
+  detailModalActions,
   customFormComponent,
+  customFormProps,
 }: CRUDTabContentProps<T>): React.ReactElement => {
   return (
     <div className="space-y-4">
@@ -114,9 +126,15 @@ export const CRUDTabContent = <T extends { id: string | number }>({
         viewMode={viewMode}
         onViewModeChange={onViewModeChange}
         rightActions={
-          <Button variant="dark" leftIcon={addButtonIcon} onClick={onAddClick}>
-            {addButtonLabel}
-          </Button>
+          addButtonLabel ? (
+            <Button
+              variant="dark"
+              leftIcon={addButtonIcon}
+              onClick={onAddClick}
+            >
+              {addButtonLabel}
+            </Button>
+          ) : undefined
         }
       />
 
@@ -132,6 +150,7 @@ export const CRUDTabContent = <T extends { id: string | number }>({
           handleRowClick={onRowClick}
           onEdit={onEdit}
           onDelete={onDelete}
+          {...dataViewProps}
         />
       ) : (
         <EmptyState message={emptyMessage} />
@@ -149,7 +168,9 @@ export const CRUDTabContent = <T extends { id: string | number }>({
         onDeleteConfirm={onDeleteConfirm}
         entityName={entityName}
         renderDetailContent={renderDetailContent}
+        detailModalActions={detailModalActions}
         customFormComponent={customFormComponent}
+        customFormProps={customFormProps}
       />
     </div>
   );
