@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Send, Plus } from "lucide-react";
 import { Button } from "../../../../../components/common/ui/Button";
 import { CalendarView } from "../../../../../hooks/features/useCalendar";
 import { formatMonthYear, formatWeekRange } from "../../../../../utils";
@@ -10,6 +10,8 @@ interface CalendarHeaderProps {
   onNext: () => void;
   onToday: () => void;
   onViewChange: (view: CalendarView) => void;
+  onSendCalendar?: () => void;
+  onCreateSchedule?: () => void;
 }
 
 export const CalendarHeader = ({
@@ -19,6 +21,8 @@ export const CalendarHeader = ({
   onNext,
   onToday,
   onViewChange,
+  onSendCalendar,
+  onCreateSchedule,
 }: CalendarHeaderProps) => {
   const getTitle = () => {
     return view === "month"
@@ -79,6 +83,28 @@ export const CalendarHeader = ({
             <ChevronRight className="w-4 h-4" />
           </Button>
         </div>
+
+        {/* Action Buttons */}
+        {onSendCalendar && (
+          <Button
+            variant="outline"
+            size="sm"
+            leftIcon={Send}
+            onClick={onSendCalendar}
+          >
+            Send Calendar
+          </Button>
+        )}
+        {onCreateSchedule && (
+          <Button
+            variant="dark"
+            size="sm"
+            leftIcon={Plus}
+            onClick={onCreateSchedule}
+          >
+            Create Schedule
+          </Button>
+        )}
       </div>
     </div>
   );

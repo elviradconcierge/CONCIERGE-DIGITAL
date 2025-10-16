@@ -37,26 +37,9 @@ export const HotelStaffPage = () => {
   const { data: staffMembers = [], isLoading } =
     useHotelStaffWithPersonalData();
 
-  // Add logs to monitor data flow
-  console.log("[HotelStaffPage] Context & Data:", {
-    hotelStaff,
-    staffMembers,
-    isLoading,
-    timestamp: new Date().toISOString(),
-  });
   const { data: tasks = [], isLoading: tasksLoading } = useTasks(hotelId || "");
   const { data: absenceRequests = [], isLoading: absenceLoading } =
     useAbsenceRequests(hotelId || "");
-
-  // Log task and absence request data
-  console.log("[HotelStaffPage] Tasks & Absences:", {
-    tasks: tasks.length,
-    absenceRequests: absenceRequests.length,
-    tasksLoading,
-    absenceLoading,
-    hotelId,
-    timestamp: new Date().toISOString(),
-  });
 
   // Check if user is admin or manager
   const isAdminOrManager = useMemo(() => {
@@ -70,16 +53,6 @@ export const HotelStaffPage = () => {
 
   // Create staff options for task and absence request forms
   const staffOptions = useMemo(() => {
-    console.log("[StaffOptions] Creating staff options:", {
-      staffMembersCount: staffMembers.length,
-      staffMembers: staffMembers.map((s) => ({
-        id: s.id,
-        name: s.name,
-        employeeId: s.employeeId,
-      })),
-      timestamp: new Date().toISOString(),
-    });
-
     return staffMembers.map((staff) => ({
       value: staff.id,
       label: `${staff.name} (${staff.employeeId})`,
@@ -95,20 +68,6 @@ export const HotelStaffPage = () => {
   const absenceFormFields = useMemo(() => {
     const currentStaff = hotelStaff.hotelStaff;
 
-    console.log("[AbsenceForm] Staff member restriction check:", {
-      currentStaff: currentStaff
-        ? {
-            id: currentStaff.id,
-            name: currentStaff.name,
-            employeeId: currentStaff.employeeId,
-            position: currentStaff.position,
-            department: currentStaff.department,
-          }
-        : null,
-      isAdminOrManager,
-      allStaffOptionsCount: staffOptions.length,
-      timestamp: new Date().toISOString(),
-    });
     const restrictedStaffOptions = isAdminOrManager
       ? staffOptions
       : currentStaff
@@ -131,13 +90,6 @@ export const HotelStaffPage = () => {
   const staffCRUD = useStaffCRUD({
     initialStaff: staffMembers,
     formFields: STAFF_FORM_FIELDS,
-  });
-
-  console.log("[HotelStaffPage] Staff CRUD:", {
-    staffCount: staffMembers.length,
-    hotelId,
-    hasStaffCRUD: !!staffCRUD,
-    timestamp: new Date().toISOString(),
   });
 
   const tasksCRUD = useTasksCRUD({

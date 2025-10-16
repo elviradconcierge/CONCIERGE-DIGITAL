@@ -146,8 +146,6 @@ export const useCreateTask = () => {
 
   return useMutation({
     mutationFn: async (task: TaskInsert) => {
-      console.log("📝 Creating task:", task.title);
-
       const { data, error } = await supabase
         .from("tasks")
         .insert([task])
@@ -159,32 +157,24 @@ export const useCreateTask = () => {
         throw error;
       }
 
-      console.log("✅ Task created:", data.id);
-
       return data;
     },
     onSuccess: async (data) => {
-      // 1️⃣ FIRST: Update UI immediately (fast response)
-      console.log("🔄 Refreshing task list...");
+      // Update UI immediately (fast response)
       await queryClient.invalidateQueries({ queryKey: ["tasks"] });
       await queryClient.invalidateQueries({ queryKey: ["tasksByStaff"] });
 
-      // 2️⃣ THEN: Send email notification asynchronously (non-blocking)
+      // Send email notification asynchronously (non-blocking)
       if (data.staff_id) {
-        console.log("📧 Scheduling email notification...");
-
-        // Small delay to ensure database transaction is committed
         setTimeout(() => {
           sendTaskNotification(data.id)
-            .then((response) => {
-              console.log("✅ Email notification sent successfully");
-              console.log("📧 Sent to:", response?.staff?.staffEmail);
+            .then(() => {
+              console.log("✅ Email notification sent");
             })
             .catch((error) => {
               console.error("⚠️ Email notification failed:", error.message);
-              // Email failure doesn't affect the task creation
             });
-        }, 500); // 500ms delay to ensure DB consistency
+        }, 500);
       }
     },
   });

@@ -116,22 +116,12 @@ export const useCreateStaff = () => {
         throw new Error("Supabase URL not configured");
       }
 
-      console.log("Starting staff creation process...");
-      console.log("Staff data:", staff);
-      console.log("Personal data:", personalData);
-
       // Get the current session for authentication
       const { data: sessionData, error: sessionError } =
         await supabase.auth.getSession();
       if (sessionError || !sessionData.session) {
-        console.error("Session error:", sessionError);
         throw new Error("No active session found");
       }
-
-      console.log(
-        "Got session token:",
-        sessionData.session.access_token.substring(0, 10) + "..."
-      );
 
       // Get the current user's hotel_id and role
       const { data: currentStaff, error: staffError } = await supabase
@@ -161,8 +151,6 @@ export const useCreateStaff = () => {
         hotelId: currentStaff.hotel_id, // Use the logged-in user's hotel_id
       };
 
-      console.log("Calling edge function with payload:", payload);
-
       // Call the edge function to create staff member
       const response = await fetch(
         `${supabaseUrl}/functions/v1/create-staff-hotel`,
@@ -176,10 +164,7 @@ export const useCreateStaff = () => {
         }
       );
 
-      console.log("Edge function response status:", response.status);
-
       const responseData = await response.json();
-      console.log("Edge function response:", responseData);
 
       if (!response.ok) {
         console.error("Edge function error:", responseData);
@@ -310,9 +295,9 @@ export const useDeleteStaff = () => {
 
       // Call the edge function to delete staff member
       const response = await fetch(
-        `${supabaseUrl}/functions/v1/delete-staff-hotel`,
+        `${supabaseUrl}/functions/v1/delete-hotel-staff`,
         {
-          method: "POST",
+          method: "DELETE",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${sessionData.session.access_token}`,
@@ -321,14 +306,20 @@ export const useDeleteStaff = () => {
         }
       );
 
+      const responseData = await response.json();
+
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to delete staff member");
+        console.error("Edge function error:", responseData);
+        throw new Error(responseData.error || "Failed to delete staff member");
       }
 
-      return staffId;
+      console.log(
+        "✅ Staff member deleted successfully:",
+        responseData.message
+      );
+      return responseData;
     },
-    onMutate: async (deletedStaffId) => {
+    onMutate: async (staffIdToDelete) => {
       // Cancel any outgoing refetches
       await queryClient.cancelQueries({ queryKey: hotelStaffKeys.lists() });
 
@@ -340,14 +331,17 @@ export const useDeleteStaff = () => {
       // Optimistically remove the staff member
       queryClient.setQueryData<StaffMember[]>(
         hotelStaffKeys.lists(),
-        (old = []) => old.filter((staff) => staff.id !== deletedStaffId)
+        (old = []) => old.filter((staff) => staff.id !== staffIdToDelete)
       );
 
       return { previousStaff };
     },
-    onError: (err, deletedStaffId, context) => {
+    onError: (_err, _staffId, context) => {
       // Roll back on error
-      queryClient.setQueryData(hotelStaffKeys.lists(), context?.previousStaff);
+      if (context?.previousStaff) {
+        queryClient.setQueryData(hotelStaffKeys.lists(), context.previousStaff);
+      }
+      console.error("❌ Failed to delete staff member");
     },
     onSettled: () => {
       // Sync with server

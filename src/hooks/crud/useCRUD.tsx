@@ -120,29 +120,20 @@ export const useCRUD = <T extends CRUDEntity>({
 
   // Handle create submission
   const handleCreateSubmit = async () => {
-    console.log("🟢 useCRUD - handleCreateSubmit called");
-    console.log("🟢 Form data:", formState.formData);
     const newEntityData = formatNewEntity(formState.formData);
-    console.log("🟢 Formatted entity data:", newEntityData);
     await crudOperations.create(newEntityData as T);
   };
 
   // Handle edit submission
   const handleEditSubmit = async () => {
-    console.log("🟠 useCRUD - handleEditSubmit called");
-    console.log("🟠 Item to edit:", modalState.itemToEdit);
     if (!modalState.itemToEdit) return;
 
-    console.log("🟠 Form data:", formState.formData);
     const updatedData = formatUpdatedEntity(formState.formData);
-    console.log("🟠 Formatted update data:", updatedData);
     await crudOperations.update(modalState.itemToEdit.id, updatedData);
   };
 
   // Handle delete confirmation
   const handleDeleteConfirm = async () => {
-    console.log("🟥 useCRUD - handleDeleteConfirm called");
-    console.log("🟥 Item to delete:", modalState.itemToDelete);
     if (!modalState.itemToDelete) return;
     await crudOperations.delete(modalState.itemToDelete.id);
   };

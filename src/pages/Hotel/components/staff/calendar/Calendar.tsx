@@ -9,12 +9,16 @@ interface CalendarProps {
   initialDate?: Date;
   schedules?: Record<string, string[]>; // Date string as key, schedules as value
   onDateSelect?: (date: Date) => void;
+  onSendCalendar?: () => void;
+  onCreateSchedule?: () => void;
 }
 
 export const Calendar = ({
   initialDate,
   schedules,
   onDateSelect,
+  onSendCalendar,
+  onCreateSchedule,
 }: CalendarProps) => {
   const calendar = useCalendar(initialDate);
 
@@ -36,6 +40,8 @@ export const Calendar = ({
         onNext={calendar.navigateNext}
         onToday={calendar.navigateToday}
         onViewChange={handleViewChange}
+        onSendCalendar={onSendCalendar}
+        onCreateSchedule={onCreateSchedule}
       />
 
       <CalendarGrid
