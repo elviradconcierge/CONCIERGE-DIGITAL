@@ -3,6 +3,7 @@ import { FormModal } from "../../../../../components/common/ui/FormModal";
 import { useHotelStaffWithPersonalData } from "../../../../../hooks/queries/hotel-management/staff";
 import { useCreateStaffSchedule } from "../../../../../hooks/queries/hotel-management/staff/useStaffScheduleQueries";
 import { useHotelStaff } from "../../../../../hooks/hotel/useHotelStaff";
+import { ScheduleForm } from "./components";
 
 interface CreateScheduleModalProps {
   isOpen: boolean;
@@ -83,9 +84,6 @@ export const CreateScheduleModal = ({
     }
   };
 
-  const inputClasses =
-    "w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 border-gray-300";
-
   return (
     <FormModal
       isOpen={isOpen}
@@ -96,134 +94,11 @@ export const CreateScheduleModal = ({
       isLoading={createSchedule.isPending}
       size="lg"
     >
-      <div className="space-y-4">
-        {/* Staff Member Selection */}
-        <div className="space-y-1">
-          <label className="block text-sm font-medium text-gray-700">
-            Staff Member <span className="text-red-500 ml-1">*</span>
-          </label>
-          <select
-            id="staff_id"
-            name="staff_id"
-            value={formData.staff_id}
-            onChange={handleInputChange}
-            required
-            className={inputClasses}
-          >
-            <option value="">Select staff member</option>
-            {staffOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Date Range */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-1">
-            <label className="block text-sm font-medium text-gray-700">
-              Start Date <span className="text-red-500 ml-1">*</span>
-            </label>
-            <input
-              id="schedule_start_date"
-              name="schedule_start_date"
-              type="date"
-              value={formData.schedule_start_date}
-              onChange={handleInputChange}
-              required
-              className={inputClasses}
-            />
-          </div>
-
-          <div className="space-y-1">
-            <label className="block text-sm font-medium text-gray-700">
-              Finish Date <span className="text-red-500 ml-1">*</span>
-            </label>
-            <input
-              id="schedule_finish_date"
-              name="schedule_finish_date"
-              type="date"
-              value={formData.schedule_finish_date}
-              onChange={handleInputChange}
-              required
-              className={inputClasses}
-            />
-          </div>
-        </div>
-
-        {/* Time Range */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-1">
-            <label className="block text-sm font-medium text-gray-700">
-              Shift Start Time <span className="text-red-500 ml-1">*</span>
-            </label>
-            <input
-              id="shift_start"
-              name="shift_start"
-              type="time"
-              value={formData.shift_start}
-              onChange={handleInputChange}
-              required
-              className={inputClasses}
-            />
-          </div>
-
-          <div className="space-y-1">
-            <label className="block text-sm font-medium text-gray-700">
-              Shift End Time <span className="text-red-500 ml-1">*</span>
-            </label>
-            <input
-              id="shift_end"
-              name="shift_end"
-              type="time"
-              value={formData.shift_end}
-              onChange={handleInputChange}
-              required
-              className={inputClasses}
-            />
-          </div>
-        </div>
-
-        {/* Status */}
-        <div className="space-y-1">
-          <label className="block text-sm font-medium text-gray-700">
-            Status
-          </label>
-          <select
-            id="status"
-            name="status"
-            value={formData.status}
-            onChange={handleInputChange}
-            className={inputClasses}
-          >
-            <option value="SCHEDULED">Scheduled</option>
-            <option value="CONFIRMED">Confirmed</option>
-            <option value="COMPLETED">Completed</option>
-            <option value="CANCELLED">Cancelled</option>
-          </select>
-        </div>
-
-        {/* Notes */}
-        <div className="space-y-1">
-          <label className="block text-sm font-medium text-gray-700">
-            Notes
-          </label>
-          <textarea
-            id="notes"
-            name="notes"
-            value={formData.notes}
-            onChange={handleInputChange}
-            placeholder="Add any notes or special instructions..."
-            rows={3}
-            maxLength={1000}
-            className={`${inputClasses} resize-vertical`}
-          />
-          <p className="text-xs text-gray-500">
-            {formData.notes.length}/1000 characters
-          </p>
-        </div>
-      </div>
+      <ScheduleForm
+        formData={formData}
+        onChange={handleInputChange}
+        staffOptions={staffOptions}
+      />
     </FormModal>
   );
 };

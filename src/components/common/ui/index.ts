@@ -26,4 +26,5 @@ export * from "./SidebarButton";
 // Input & Search
 export * from "./SearchInput";
 export * from "./FilterButton";
+export * from "./FilterDropdown";
 export * from "./CopyButton";

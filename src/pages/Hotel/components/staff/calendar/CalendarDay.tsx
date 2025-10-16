@@ -1,11 +1,17 @@
 import { isSameDay, isSameMonth, isToday } from "../../../../../utils";
 
+interface ScheduleBadge {
+  name: string;
+  time: string;
+  status: string;
+}
+
 interface CalendarDayProps {
   date: Date;
   currentDate: Date;
   selectedDate: Date | null;
   onClick: (date: Date) => void;
-  schedules?: string[]; // For displaying staff schedules
+  schedules?: ScheduleBadge[]; // For displaying staff schedules with status
 }
 
 export const CalendarDay = ({
@@ -19,6 +25,22 @@ export const CalendarDay = ({
   const isCurrentDay = isToday(date);
   const isInCurrentMonth = isSameMonth(date, currentDate);
   const hasSchedules = schedules.length > 0;
+
+  // Status-based badge colors
+  const getStatusColors = (status: string) => {
+    switch (status.toUpperCase()) {
+      case "CONFIRMED":
+        return "bg-green-100 text-green-700";
+      case "SCHEDULED":
+        return "bg-blue-100 text-blue-700";
+      case "COMPLETED":
+        return "bg-gray-100 text-gray-700";
+      case "CANCELLED":
+        return "bg-red-100 text-red-700";
+      default:
+        return "bg-blue-100 text-blue-700";
+    }
+  };
 
   const dayClassName = [
     "relative w-full h-20 p-2 border border-gray-200 cursor-pointer transition-colors",
@@ -61,9 +83,12 @@ export const CalendarDay = ({
           {schedules.slice(0, 2).map((schedule, index) => (
             <div
               key={index}
-              className="text-xs bg-blue-100 text-blue-800 px-1 py-0.5 rounded truncate"
+              className={`text-xs px-1 py-0.5 rounded truncate ${getStatusColors(
+                schedule.status
+              )}`}
+              title={`${schedule.name} - ${schedule.time} (${schedule.status})`}
             >
-              {schedule}
+              {schedule.name} - {schedule.time}
             </div>
           ))}
         </div>

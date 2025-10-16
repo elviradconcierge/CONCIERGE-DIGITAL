@@ -5,12 +5,22 @@ import {
   CalendarView,
 } from "../../../../../hooks/features/useCalendar";
 
+interface ScheduleBadge {
+  name: string;
+  time: string;
+  status: string;
+}
+
 interface CalendarProps {
   initialDate?: Date;
-  schedules?: Record<string, string[]>; // Date string as key, schedules as value
+  schedules?: Record<string, ScheduleBadge[]>; // Date string as key, schedules with status as value
   onDateSelect?: (date: Date) => void;
   onSendCalendar?: () => void;
   onCreateSchedule?: () => void;
+  searchQuery?: string;
+  onSearchChange?: (query: string) => void;
+  statusFilter?: string;
+  onStatusFilterChange?: (status: string) => void;
 }
 
 export const Calendar = ({
@@ -19,6 +29,10 @@ export const Calendar = ({
   onDateSelect,
   onSendCalendar,
   onCreateSchedule,
+  searchQuery,
+  onSearchChange,
+  statusFilter,
+  onStatusFilterChange,
 }: CalendarProps) => {
   const calendar = useCalendar(initialDate);
 
@@ -42,6 +56,10 @@ export const Calendar = ({
         onViewChange={handleViewChange}
         onSendCalendar={onSendCalendar}
         onCreateSchedule={onCreateSchedule}
+        searchQuery={searchQuery}
+        onSearchChange={onSearchChange}
+        statusFilter={statusFilter}
+        onStatusFilterChange={onStatusFilterChange}
       />
 
       <CalendarGrid

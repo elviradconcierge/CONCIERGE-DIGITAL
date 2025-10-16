@@ -2,12 +2,18 @@ import { CalendarDay } from "./CalendarDay";
 import { CalendarView } from "../../../../../hooks/features/useCalendar";
 import { getCalendarDays, getWeekDays, WEEKDAYS } from "../../../../../utils";
 
+interface ScheduleBadge {
+  name: string;
+  time: string;
+  status: string;
+}
+
 interface CalendarGridProps {
   currentDate: Date;
   selectedDate: Date | null;
   view: CalendarView;
   onDateClick: (date: Date) => void;
-  schedules?: Record<string, string[]>; // Date string as key, schedules as value
+  schedules?: Record<string, ScheduleBadge[]>; // Date string as key, schedules with status as value
 }
 
 export const CalendarGrid = ({

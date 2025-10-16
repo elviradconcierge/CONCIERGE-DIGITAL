@@ -1,5 +1,7 @@
 import { ChevronLeft, ChevronRight, Send, Plus } from "lucide-react";
 import { Button } from "../../../../../components/common/ui/Button";
+import { SearchInput } from "../../../../../components/common/ui/SearchInput";
+import { FilterDropdown } from "../../../../../components/common/ui/FilterDropdown";
 import { CalendarView } from "../../../../../hooks/features/useCalendar";
 import { formatMonthYear, formatWeekRange } from "../../../../../utils";
 
@@ -12,7 +14,18 @@ interface CalendarHeaderProps {
   onViewChange: (view: CalendarView) => void;
   onSendCalendar?: () => void;
   onCreateSchedule?: () => void;
+  searchQuery?: string;
+  onSearchChange?: (query: string) => void;
+  statusFilter?: string;
+  onStatusFilterChange?: (status: string) => void;
 }
+
+const STATUS_OPTIONS = [
+  { value: "SCHEDULED", label: "Scheduled" },
+  { value: "CONFIRMED", label: "Confirmed" },
+  { value: "COMPLETED", label: "Completed" },
+  { value: "CANCELLED", label: "Cancelled" },
+];
 
 export const CalendarHeader = ({
   currentDate,
@@ -23,6 +36,10 @@ export const CalendarHeader = ({
   onViewChange,
   onSendCalendar,
   onCreateSchedule,
+  searchQuery,
+  onSearchChange,
+  statusFilter,
+  onStatusFilterChange,
 }: CalendarHeaderProps) => {
   const getTitle = () => {
     return view === "month"
@@ -32,6 +49,7 @@ export const CalendarHeader = ({
 
   return (
     <div className="flex items-center justify-between mb-6">
+      {/* Left Side: Title, Today Button, and Search Box */}
       <div className="flex items-center space-x-4">
         <h2 className="text-2xl font-semibold text-gray-900">{getTitle()}</h2>
         <Button
@@ -42,8 +60,26 @@ export const CalendarHeader = ({
         >
           Today
         </Button>
+        {onSearchChange && (
+          <SearchInput
+            value={searchQuery}
+            onSearchChange={onSearchChange}
+            placeholder="Search by staff member name..."
+            className="w-64"
+          />
+        )}
+        {onStatusFilterChange && (
+          <FilterDropdown
+            label="Status"
+            value={statusFilter || ""}
+            options={STATUS_OPTIONS}
+            onChange={onStatusFilterChange}
+            placeholder="All Statuses"
+          />
+        )}
       </div>
 
+      {/* Right Side: View Toggle, Navigation, and Action Buttons */}
       <div className="flex items-center space-x-2">
         {/* View Toggle */}
         <div className="flex bg-gray-100 rounded-lg p-1">
