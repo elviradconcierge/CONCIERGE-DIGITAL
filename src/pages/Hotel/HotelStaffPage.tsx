@@ -18,12 +18,20 @@ import {
   getAbsenceRequestFormFields,
 } from "./components/staff";
 import { useStaffCRUD, useTasksCRUD, useAbsenceRequestsCRUD } from "./hooks";
+import { setHotelId } from "./hooks/useCRUDWithMutations";
 import { CRUDTabContent } from "./components/CRUDTabContent";
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 
 export const HotelStaffPage = () => {
   const hotelStaff = useHotelStaff();
   const { hotelId } = hotelStaff;
+
+  // Set hotel ID for CRUD operations
+  useEffect(() => {
+    if (hotelId) {
+      setHotelId(hotelId);
+    }
+  }, [hotelId]);
 
   // Fetch data
   const { data: staffMembers = [], isLoading } =

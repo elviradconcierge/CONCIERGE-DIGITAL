@@ -89,3 +89,10 @@ export {
   useAssignTask,
   useDeleteTask,
 } from "./useTaskQueries";
+
+// Notification hook exports
+export {
+  sendTaskNotification,
+  useSendTaskNotification,
+  type TaskNotificationResponse,
+} from "./useTaskNotifications";

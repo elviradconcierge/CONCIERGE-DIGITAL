@@ -45,25 +45,51 @@ export const useAbsenceRequestsCRUD = ({
     updateMutation: useUpdateAbsenceRequest(),
     deleteMutation: useDeleteAbsenceRequest(),
     // Transform form data to database insert format
-    transformCreate: (data) => ({
-      staff_id: (data.staffId as string) || "",
-      hotel_id: getHotelId(),
-      request_type:
-        (data.requestType as
-          | "vacation"
-          | "sick"
-          | "personal"
-          | "training"
-          | "other") || "personal",
-      start_date: (data.startDate as string) || "",
-      end_date: (data.endDate as string) || "",
-      status:
-        (data.status as "pending" | "approved" | "rejected" | "cancelled") ||
-        "pending",
-      notes: (data.notes as string) || null,
-      data_processing_consent: true,
-      consent_date: new Date().toISOString(),
-    }),
+    transformCreate: (data) => {
+      console.log("[AbsenceRequest] transformCreate - Raw form data:", data);
+
+      const staffId = (data.staffId as string) || "";
+      const hotelId = getHotelId();
+
+      if (!staffId) {
+        console.error(
+          "[AbsenceRequest] transformCreate - Missing staffId:",
+          data
+        );
+        throw new Error("Staff ID is required");
+      }
+
+      if (!hotelId) {
+        console.error("[AbsenceRequest] transformCreate - Missing hotelId");
+        throw new Error("Hotel ID is required");
+      }
+
+      const transformed = {
+        staff_id: staffId,
+        hotel_id: hotelId,
+        request_type:
+          (data.requestType as
+            | "vacation"
+            | "sick"
+            | "personal"
+            | "training"
+            | "other") || "personal",
+        start_date: (data.startDate as string) || "",
+        end_date: (data.endDate as string) || "",
+        status:
+          (data.status as "pending" | "approved" | "rejected" | "cancelled") ||
+          "pending",
+        notes: (data.notes as string) || null,
+        data_processing_consent: true,
+        consent_date: new Date().toISOString(),
+      };
+
+      console.log(
+        "[AbsenceRequest] transformCreate - Transformed data:",
+        transformed
+      );
+      return transformed;
+    },
     // Transform form data to database update format
     transformUpdate: (id, data) => ({
       id: id as string,

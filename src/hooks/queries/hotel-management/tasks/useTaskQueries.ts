@@ -19,6 +19,7 @@ import {
 } from "./task.types";
 import { taskKeys, TASK_SELECT_QUERY } from "./task.constants";
 import { transformTask, transformTasks } from "./task.transformers";
+import { sendTaskNotification } from "./useTaskNotifications";
 
 // ============================================================================
 // Query Hooks
@@ -145,6 +146,8 @@ export const useCreateTask = () => {
 
   return useMutation({
     mutationFn: async (task: TaskInsert) => {
+      console.log("📝 Creating task:", task.title);
+
       const { data, error } = await supabase
         .from("tasks")
         .insert([task])
@@ -152,16 +155,37 @@ export const useCreateTask = () => {
         .single();
 
       if (error) {
+        console.error("❌ Task creation failed:", error.message);
         throw error;
       }
+
+      console.log("✅ Task created:", data.id);
+
       return data;
     },
-    onSuccess: (_, variables) => {
-      // Invalidate tasks list for this hotel
-      queryClient.invalidateQueries({
-        queryKey: taskKeys.list({ hotelId: variables.hotel_id }),
-      });
-      queryClient.invalidateQueries({ queryKey: taskKeys.lists() });
+    onSuccess: async (data) => {
+      // 1️⃣ FIRST: Update UI immediately (fast response)
+      console.log("🔄 Refreshing task list...");
+      await queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      await queryClient.invalidateQueries({ queryKey: ["tasksByStaff"] });
+
+      // 2️⃣ THEN: Send email notification asynchronously (non-blocking)
+      if (data.staff_id) {
+        console.log("📧 Scheduling email notification...");
+
+        // Small delay to ensure database transaction is committed
+        setTimeout(() => {
+          sendTaskNotification(data.id)
+            .then((response) => {
+              console.log("✅ Email notification sent successfully");
+              console.log("📧 Sent to:", response?.staff?.staffEmail);
+            })
+            .catch((error) => {
+              console.error("⚠️ Email notification failed:", error.message);
+              // Email failure doesn't affect the task creation
+            });
+        }, 500); // 500ms delay to ensure DB consistency
+      }
     },
   });
 };

@@ -19,11 +19,17 @@ export const getAbsenceRequestFormFields = (
   {
     key: "staffId",
     label: "Staff Member",
-    type: isAdminOrManager ? "select" : "text",
-    placeholder: isAdminOrManager ? "Select staff member" : "",
+    type: "select",
+    placeholder: isAdminOrManager ? "Select staff member" : "Current User",
     required: true,
     disabled: !isAdminOrManager,
-    options: isAdminOrManager ? staffOptions : undefined,
+    defaultValue:
+      !isAdminOrManager && currentStaffId ? currentStaffId : undefined,
+    options: isAdminOrManager
+      ? staffOptions
+      : currentStaffId
+      ? [{ value: currentStaffId, label: "Current User" }]
+      : [],
     validation: (value) => {
       if (!value) return "Staff member is required";
       return null;

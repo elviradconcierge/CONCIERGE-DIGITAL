@@ -27,8 +27,8 @@ export interface CRUDWithMutationsConfig<TEntity, TCreate, TUpdate> {
   searchFields?: string[];
   defaultViewMode?: "list" | "grid";
 
-  // Staff context for operations
-  staffContext: StaffContext;
+  // Staff context for operations (optional)
+  staffContext?: StaffContext;
 
   // Mutation hooks - accept any mutation result with mutateAsync
   createMutation: {
@@ -144,10 +144,15 @@ export function useCRUDWithMutations<
 }
 
 /**
- * Common helper to get hotel ID from context
- * TODO: Replace this with actual context hook when available
+ * Common helper to get hotel ID
+ * This should be passed from the parent component that has access to useHotelStaff
  */
+let cachedHotelId: string = "";
+
+export const setHotelId = (hotelId: string) => {
+  cachedHotelId = hotelId;
+};
+
 export const getHotelId = (): string => {
-  // This should eventually come from HotelContext or similar
-  return HOTEL_ID;
+  return cachedHotelId;
 };
